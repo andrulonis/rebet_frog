@@ -24,4 +24,7 @@ colcon build --symlink-install --packages-skip rebet_samples
 ```bash
 pip install ultralytics
 ```
-
+as well as masced_bandits
+```bash
+pip install masced_bandits
+```
