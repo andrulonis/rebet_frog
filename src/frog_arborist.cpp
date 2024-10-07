@@ -66,7 +66,7 @@ public:
           RCLCPP_INFO(node()->get_logger(), "current_task: %s", getStringOrNot("current_task").c_str());
 
           time_since_last = current_time;
-
+          bt_name = "temp_fix";
           auto message = std_msgs::msg::String();
           std::string header = std::to_string(total_elapsed) 
           + " " + "bt_name"

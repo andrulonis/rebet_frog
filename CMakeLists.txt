@@ -97,6 +97,8 @@ install(PROGRAMS
   scripts/system_reflection.py
   scripts/tree_action_client.py
   scripts/weights_set_client.py
+  scripts/yolo_as_a_service.py
+  scripts/noisy_camera.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

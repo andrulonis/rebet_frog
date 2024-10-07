@@ -263,8 +263,6 @@ class AdaptPictureRateInternal: public AdaptOnConditionOnStart<int>
      
       auto pow_budget_res = getInput(POW_IN, remaining_power_budget);
       auto curr_light_res = getInput(IN_LIGHT,_light_attribute);
-
-      float current_darkness = _light_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data;
       std::vector<double> task_metrics;
       
       auto task_res = getInput(PICTASK_IN, task_metrics);
@@ -276,6 +274,7 @@ class AdaptPictureRateInternal: public AdaptOnConditionOnStart<int>
 
       if(curr_light_res)
       {
+        float current_darkness = _light_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data;
         std::cout << "\n\n\nin eval condition darkness\n\n\n" << current_darkness << std::endl;
       }
       else
@@ -300,6 +299,7 @@ class AdaptPictureRateInternal: public AdaptOnConditionOnStart<int>
 
       if(task_res && pow_budget_res && curr_light_res)
       {
+        float current_darkness = _light_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data;
         if(remaining_power_budget < 0.0)
         {
           return change_camera_feed(ALT_CAMERA_TOPIC);

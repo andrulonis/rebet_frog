@@ -13,7 +13,7 @@ def generate_launch_description():
 
 
     yolo_node = LifecycleNode(name='detect_object', namespace='',
-        package='rebet', executable='yolo_as_a_service.py', output='screen')
+        package='rebet_frog', executable='yolo_as_a_service.py', output='screen')
 
 
 

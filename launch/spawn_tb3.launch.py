@@ -8,7 +8,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import AnyLaunchDescriptionSource
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 import numpy as np
 import random
 
@@ -33,7 +33,7 @@ sparse_world_cardboard_boxes = [
     # Add more cardboard boxes as needed
 ]
 
-def generate_launch_description():
+def launch_setup(context, *args, **kwargs):
 
 
 
@@ -43,11 +43,12 @@ def generate_launch_description():
 
 
     gui = LaunchConfiguration('gui')
-    gui_arg = DeclareLaunchArgument(
-        'gui',
-        default_value='true',
-        description='Run with gui (true/false)')
+    seed = LaunchConfiguration('myseed')
 
+    seed_index = int(seed.perform(context))
+
+    np.random.seed(1337 * seed_index)
+    
     tb3_path = get_package_share_directory('turtlebot3_gazebo')
     tb3_launch_path = os.path.join(
         tb3_path, 'launch', 'turtlebot3_world.launch.py')
@@ -63,8 +64,6 @@ def generate_launch_description():
 
     fire_hydrant_object = [{'pose': (fh_x_random, fh_y_random, -0.14), 'size': (0.5, 0.4, 0.3)}]
 
-    # random.seed(1337)
-
     tb_x_random,tb_y_random = np.random.uniform(low=-1.7, high=1.7, size=2)
 
     while(is_point_inside_boxes(tb_x_random,tb_y_random, (sparse_world_cardboard_boxes+fire_hydrant_object))):
@@ -77,13 +76,12 @@ def generate_launch_description():
     tb_x_pose = LaunchConfiguration('x_pose', default=str(tb_x_random))
     tb_y_pose = LaunchConfiguration('y_pose', default=str(tb_y_random))
 
-
-    
     custom_world =  IncludeLaunchDescription(
         AnyLaunchDescriptionSource(custom_world_launch_path),
         launch_arguments={
            'gui': gui,
         }.items())
+
     model_name = 'fire_hydrant_small'
     spawn_box = Node(
         package='gazebo_ros',
@@ -114,10 +112,28 @@ def generate_launch_description():
         ),
         launch_arguments={'use_sim_time': use_sim_time}.items()
     )
+
+    return [custom_world,spawn_box,spawn_turtlebot_cmd, robot_state_publisher_cmd]
+
+
+
+
+
+def generate_launch_description():
+    
+    gui_arg = DeclareLaunchArgument(
+        'gui',
+        default_value='true',
+        description='Run with gui (true/false)')
+
+    seed_arg = DeclareLaunchArgument(
+        'myseed',
+        default_value='0',
+        description='seed')
+
+
     return LaunchDescription([
-        custom_world,
-        spawn_box,
-        spawn_turtlebot_cmd,
-        robot_state_publisher_cmd,
+        seed_arg,
         gui_arg,
+        OpaqueFunction(function=launch_setup),
     ])

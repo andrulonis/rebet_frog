@@ -30,7 +30,7 @@ class SystemReflection(Node):
         print("Initializing the node...")
         #self.node_name = 'system_reflection'
 
-        #This node contains subscriptions to more than just FROG data, which is how it is meant to be.
+        #This node contains subscriptions to more than just FROG data, which is no longer how it is meant to be.
         
         super().__init__('system_reflection')
         
