@@ -22,8 +22,4 @@ repositories:
   rebet:
     type: git
     url: https://github.com/EGAlberts/ReBeT.git
-    version: fdc403e
-  rebet_frog:
-    type: git
-    url: https://github.com/EGAlberts/rebet_frog.git
-    version: 192d118
+    version: 64e0cc3
