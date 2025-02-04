@@ -7,8 +7,7 @@ from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import AnyLaunchDescriptionSource
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetEnvironmentVariable
 import numpy as np
 import random
 
@@ -34,8 +33,6 @@ sparse_world_cardboard_boxes = [
 ]
 
 def launch_setup(context, *args, **kwargs):
-
-
 
     launch_file_dir = os.path.join(get_package_share_directory('turtlebot3_gazebo'), 'launch')
 
@@ -120,7 +117,9 @@ def launch_setup(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    
+
+    using_waffle = SetEnvironmentVariable(name="TURTLEBOT3_MODEL",value="waffle")
+
     gui_arg = DeclareLaunchArgument(
         'gui',
         default_value='true',
@@ -133,6 +132,7 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        using_waffle,
         seed_arg,
         gui_arg,
         OpaqueFunction(function=launch_setup),

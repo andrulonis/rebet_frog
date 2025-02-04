@@ -17,7 +17,7 @@ class ReportExperiment(Node):
         super().__init__('report_on_experiment_node')
 
 
-        self.sub = self.create_subscription(String, '/arborist/reporting', self.update_csv, 10)
+        self.sub = self.create_subscription(String, '/frog_arborist/reporting', self.update_csv, 10)
         self.rows_to_write = []
         self.count = 0
 

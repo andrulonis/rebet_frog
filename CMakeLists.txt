@@ -99,6 +99,7 @@ install(PROGRAMS
   scripts/weights_set_client.py
   scripts/yolo_as_a_service.py
   scripts/noisy_camera.py
+  scripts/report_on_experiment.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

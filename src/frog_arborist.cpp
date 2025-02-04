@@ -105,6 +105,12 @@ public:
           publisher_->publish(message);
 
         }
+
+        if(total_elapsed >= time_limit)
+        {
+          return BT::NodeStatus::SUCCESS;
+        }
+        
         return std::nullopt;
   }
 

@@ -25,9 +25,13 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import LaunchConfigurationEquals
+from launch.substitutions import EnvironmentVariable, TextSubstitution
+from launch.actions import AppendEnvironmentVariable
+from launch.actions import LogInfo
 
 def generate_launch_description():
 
+    gz_models = "GAZEBO_MODEL_PATH"
     gui_arg = DeclareLaunchArgument(
         'gui',
         default_value='true',
@@ -49,6 +53,7 @@ def generate_launch_description():
 
 
     models_file_dir = os.path.join(get_package_share_directory('rebet_frog'), 'models')
+    add_model_path = AppendEnvironmentVariable(name=gz_models, value=models_file_dir)
 
     gzserver_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -64,16 +69,8 @@ def generate_launch_description():
         
     )
 
-
-
-
-
     return LaunchDescription(
-        [gzserver_cmd, gzclient_cmd, gui_arg],
+        [add_model_path, gui_arg, gzserver_cmd, gzclient_cmd],
     )
-
-    # Add the commands to the launch description
-
-
 
 
