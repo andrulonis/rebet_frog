@@ -72,6 +72,12 @@ ros2 run rebet_frog system_reflection.py
 ```
 For collecting and storing system information in the BT's knowledge.
 
+YOLO/Ultralytics
+```bash
+ros2 launch rebet_frog yolo_self_start_launch.py 
+```
+Provides a ROS2 service for object detection with YOLOv8n.
+
 Navigation 2
 Depending on whether you plan to perform SLAM or use a pre-made map there are two different launch files.
 For SLAM:
