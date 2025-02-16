@@ -36,6 +36,11 @@ def generate_launch_description():
         'gui',
         default_value='true',
         description='Run with gui (true/false)')
+    
+    world_arg = DeclareLaunchArgument(
+        'world',
+        default_value='acsos2024.world',
+        description='Gazebo world to use, default acsos2024')
 
 
     
@@ -45,11 +50,8 @@ def generate_launch_description():
 
 
 
-    world = os.path.join(
-        get_package_share_directory('rebet_frog'),
-        'worlds',
-        'sparse_world_cam.world'
-    )
+    worlds_directory = os.path.join(
+        get_package_share_directory('rebet_frog'),'worlds',)
 
 
     models_file_dir = os.path.join(get_package_share_directory('rebet_frog'), 'models')
@@ -59,7 +61,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')
         ),
-        launch_arguments={'world': world, 'verbose': 'true'}.items(),
+        launch_arguments={'world': (worlds_directory, os.path.sep, LaunchConfiguration('world')), 'verbose': 'true'}.items(),
     )
 
     gzclient_cmd = IncludeLaunchDescription(
@@ -70,7 +72,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription(
-        [add_model_path, gui_arg, gzserver_cmd, gzclient_cmd],
+        [add_model_path, gui_arg, world_arg, gzserver_cmd, gzclient_cmd],
     )
 
 

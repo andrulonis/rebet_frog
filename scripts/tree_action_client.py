@@ -42,8 +42,8 @@ class TreeActionClient(Node):
         
         result = future.result().result
 
-        self.get_logger().info('END MESSAGE' + str(result.return_message))
-        if result.node_status == 2:
+        self.get_logger().info('END MESSAGE ' + str(result.return_message))
+        if result.node_status.status == 2:
             self.get_logger().info('Result: Done ticking BT, ended on Success')
         else:
             self.get_logger().info('Result: Done ticking BT, ended on Failure')

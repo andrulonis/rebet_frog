@@ -47,46 +47,41 @@ colcon build --symlink-install
 ## Usage:
 There are myriad launch files which need to be executed. No matter which configuration of rebet_frog you want to use the following launch files should be used:
 Make sure you always have the workspace sourced when running these commands (```source ~/rebet_ws/install/setup.bash```).
-Gazebo Classic
+### Gazebo Classic
 Note: you may need to source this first for your gazebo classic to work ```bash source /usr/share/gazebo/setup.bash```.
 ```bash
 ros2 launch rebet_frog spawn_tb3.launch.py gui:=true myseed:=1
 ```
 For launching the simulation and spawning the turtlebot3 waffle into the world.
 
-Arborist
+### Arborist
 ```bash
 ros2 launch rebet_frog arborist_config_launch.py
 ```
 For managing the behavior trees.
 
-AAL
+### AAL
 ```bash
 ros2 run aal adaptation_layer
 ```
 For providing architectural adaptations of ROS2 Nodes.
 
-System Reflection
+### System Reflection
 ```bash
 ros2 run rebet_frog system_reflection.py
 ```
 For collecting and storing system information in the BT's knowledge.
 
-YOLO/Ultralytics
-```bash
-ros2 launch rebet_frog yolo_self_start_launch.py 
-```
-Provides a ROS2 service for object detection with YOLOv8n.
+### Navigation 2
+Depending on whether you plan to perform SLAM or use a pre-made map can be specified through the use_map launch argument. When use_map is false, slam_toolbox is launched to create a map.
 
-Navigation 2
-Depending on whether you plan to perform SLAM or use a pre-made map there are two different launch files.
 For SLAM:
 ```bash
-ros2 launch rebet_frog nav2_slam_launch.py
+ros2 launch rebet_frog navigation_launch.py use_map:=false
 ```
 and for the pre-made map:
 ```bash
-ros2 launch rebet_frog nav2_map_launch.py
+ros2 launch rebet_frog navigation_launch.py use_map:=true
 ```
 
 If you are choosing to perform SLAM, you can automate the process with frontier exploration:
@@ -94,6 +89,13 @@ If you are choosing to perform SLAM, you can automate the process with frontier 
 ros2 launch wavefront_frontier frontier_launch.py 
 ```
 
+### YOLO
+Some of the missions expect YOLO to be running for object detection.
+```bash
+ros2 launch rebet_frog yolo_self_start_launch.py 
+```
+
+### Start Mission
 Ultimately, to start the mission you need to use the following command:
 ```bash
 ros2 run rebet_frog tree_action_client.py BT_NAME
