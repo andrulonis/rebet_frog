@@ -13,7 +13,7 @@ repositories:
     version: 85a1f85
   aal:
     type: git
-    url: https://github.com/EGAlberts/AAL-ROS2.git
+    url: https://github.com/andrulonis/AAL-ROS2
     version: 2e3cb17
   turtlebot3_simulations:
     type: git
