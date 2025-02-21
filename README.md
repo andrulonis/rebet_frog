@@ -44,6 +44,12 @@ pip install masced_bandits
 colcon build --symlink-install
 ```
 
+6. (TEMPORARY STEP) Download [PRISM](https://www.prismmodelchecker.org/manual/InstallingPRISM/Instructions), place it in `~/rebet_ws` and run the following:
+```bash
+cd ~/rebet_ws/{prism_dir}
+./install.sh
+```
+
 ## Usage:
 There are myriad launch files which need to be executed. No matter which configuration of rebet_frog you want to use the following launch files should be used:
 Make sure you always have the workspace sourced when running these commands (```source ~/rebet_ws/install/setup.bash```).
