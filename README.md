@@ -15,7 +15,7 @@ mkdir -p ~/rebet_ws/src
 
 2. Clone this repository. For example:
 ```bash
-git clone https://github.com/EGAlberts/rebet_frog.git
+git clone https://github.com/andrulonis/rebet_frog.git
 ```
 Keep in mind if you are using a specific branch or commit version that should be reflected in the clone, or remedied after cloning the default branch.
 
