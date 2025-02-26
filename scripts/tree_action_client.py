@@ -13,18 +13,21 @@ class TreeActionClient(Node):
         super().__init__('tree_action_client')
         self._action_client = ActionClient(self, ExecuteTree, 'behavior_server')
 
+        self.declare_parameter('autostart', True)
+
     def send_goal(self, tree_name):
-        goal_msg = ExecuteTree.Goal()
+        if(self.get_parameter("autostart").value or not input("Press enter to start")):
+            goal_msg = ExecuteTree.Goal()
 
-        goal_msg.target_tree = tree_name
-    
-        self._action_client.wait_for_server()
+            goal_msg.target_tree = tree_name
+        
+            self._action_client.wait_for_server()
 
-        self._send_goal_future = self._action_client.send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
+            self._send_goal_future = self._action_client.send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
 
-        self._send_goal_future.add_done_callback(self.goal_response_callback)
+            self._send_goal_future.add_done_callback(self.goal_response_callback)
 
-        return self._send_goal_future
+            return self._send_goal_future
 
     def goal_response_callback(self, future):
         goal_handle = future.result()
@@ -58,6 +61,10 @@ class TreeActionClient(Node):
 
 
 def main():
+    if(len(sys.argv) < 2):
+        print("Missing bt_name argument!")
+        sys.exit(1)
+
     rclpy.init()
 
     action_client = TreeActionClient()

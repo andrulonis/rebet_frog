@@ -35,9 +35,15 @@ public:
 
     bool setRequest(typename Request::SharedPtr& request) override
     {
-        RCLCPP_INFO(logger(), "Get map set");
+        RCLCPP_INFO(logger(), "Created request to get map from %s", service_name_.c_str());
 
         return true;
+    }
+
+    BT::NodeStatus onFailure(ServiceNodeErrorCode /*error*/)
+    {
+        RCLCPP_INFO(logger(), "Failed requesting map from service: %s. It likely does not exist, check if navigation is running properly.", service_name_.c_str());
+        return NodeStatus::FAILURE;
     }
 
     BT::NodeStatus onResponseReceived(const typename Response::SharedPtr& response) override
