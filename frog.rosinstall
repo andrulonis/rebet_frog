@@ -21,6 +21,6 @@ repositories:
     version: d16cdbe
   rebet:
     type: git
-    url: https://github.com/EGAlberts/ReBeT.git
+    url: https://github.com/andrulonis/ReBeT
     version: 7330e01
 
