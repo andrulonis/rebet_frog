@@ -14,7 +14,7 @@ repositories:
   aal:
     type: git
     url: https://github.com/andrulonis/AAL-ROS2
-    version: 2e3cb17
+    version: 5c99a92
   turtlebot3_simulations:
     type: git
     url: https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
@@ -22,4 +22,5 @@ repositories:
   rebet:
     type: git
     url: https://github.com/EGAlberts/ReBeT.git
-    version: 64e0cc3
+    version: 7330e01
+

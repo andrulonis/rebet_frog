@@ -64,6 +64,7 @@ public:
           total_elapsed++;
           RCLCPP_INFO(node()->get_logger(), "%d seconds have passed", total_elapsed);
           RCLCPP_INFO(node()->get_logger(), "current_task: %s", getStringOrNot("current_task").c_str());
+          RCLCPP_INFO(node()->get_logger(), "current_status: %s", toStr(status).c_str());
 
           time_since_last = current_time;
           auto message = std_msgs::msg::String();
@@ -104,7 +105,15 @@ public:
 
           publisher_->publish(message);
 
+          //Now we also put the QRs in the blackboard
+          auto sys_qr_nodes = get_tree_qrs<SystemLevelQR>();
+          globalBlackboard()->set<std::vector<QR_MSG>>("system_level_qrs",create_qr_msgs<SystemLevelQR>(sys_qr_nodes));
+
+          auto tsk_qr_nodes = get_tree_qrs<TaskLevelQR>();
+          globalBlackboard()->set<std::vector<QR_MSG>>("task_level_qrs",create_qr_msgs<TaskLevelQR>(tsk_qr_nodes));
+          
         }
+        
 
         if(total_elapsed >= time_limit)
         {
@@ -117,6 +126,7 @@ public:
   virtual std::optional<std::string> onTreeExecutionCompleted(BT::NodeStatus status,
                                                               bool was_cancelled)
   {
+    RCLCPP_INFO(node()->get_logger(), "Was cancelled?: %s", was_cancelled ? "true" : "false");
     if(status == BT::NodeStatus::SUCCESS)
     {
       auto end_message = std_msgs::msg::String();

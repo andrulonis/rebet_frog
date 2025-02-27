@@ -27,11 +27,11 @@
 					<Inverter>
 						<PowerQR weight="{sys_power_weight}" metric="{@sys_power_metric}" mean_metric="{sys_power_mean_metric}" out_status="{@power_status}">
 						<Sequence>
-							<RetryUntilSuccessful num_attempts="-1">
+							<RetryUntilSuccessful num_attempts="10">
 								<getMap service_name="/slam_toolbox/dynamic_map" map_retrieved="{current_map}"/>
 							</RetryUntilSuccessful>
 
-							<RetryUntilSuccessful num_attempts="-1">
+							<RetryUntilSuccessful num_attempts="10">
 								<getRobotPose topic_name="/odom" out_pose="{current_pose}" />
 							</RetryUntilSuccessful>
 							
