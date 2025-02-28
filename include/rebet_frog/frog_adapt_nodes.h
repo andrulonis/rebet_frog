@@ -443,7 +443,7 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
 
 
 
-    virtual std::tuple<double,double> utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
+    virtual std::tuple<double,double, double, double> utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
     {
       std::cout << "util_of_adap_max_speed" << std::endl;
       auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
@@ -470,7 +470,7 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
         //MoveSafely is in violation.
         if(!is_safe(current_safety) && chosen_max_speed > 0.10)
         {
-          return std::make_tuple(0.0, current_safety);
+          return std::make_tuple(0.0, current_safety, current_power, current_move);
         }
         else
         {
@@ -484,16 +484,16 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
 
           if(utility < 0.0 || current_move < 0.0 || current_power < 0.0) //can happen if there's no values yet.
           {
-            return std::make_tuple(0.0, current_safety);
+            return std::make_tuple(0.0, current_safety, current_power, current_move);
           }
-          return std::make_tuple(utility, current_safety);
+          return std::make_tuple(utility, current_safety, current_power, current_move);
         }
 
       }
       else
       {
         std::cout << "For some reason a value was not found in the blackboard" << std::endl;  
-        return std::make_tuple(0.0, 0.0);
+        return std::make_tuple(0.0, 0.0, 0.0, 0.0);
       }
 
     }
