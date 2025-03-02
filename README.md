@@ -52,7 +52,7 @@ cd ~/rebet_ws/prism-4.8.1-linux64-x86
 
 ## Usage:
 There are myriad launch files which need to be executed. No matter which configuration of rebet_frog you want to use the following launch files should be used:
-Make sure you always have the workspace sourced when running these commands (```source ~/rebet_ws/install/setup.bash```). Launch it from the rebet_ws directory (`cd ~/rebet_ws`).
+Make sure you always have the workspace sourced when running these commands (```source ~/rebet_ws/install/setup.bash```). Launch everything from the rebet_ws directory (`cd ~/rebet_ws`).
 ### Gazebo Classic
 Note: you may need to source this first for your gazebo classic to work ```bash source /usr/share/gazebo/setup.bash```.
 ```bash
