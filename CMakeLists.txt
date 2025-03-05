@@ -93,13 +93,11 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   scripts/blackboard_set_client.py
-  scripts/blackboard_get_client.py
   scripts/system_reflection.py
   scripts/tree_action_client.py
   scripts/weights_set_client.py
   scripts/yolo_as_a_service.py
   scripts/noisy_camera.py
-  scripts/report_on_experiment.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

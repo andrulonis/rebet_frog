@@ -22,5 +22,4 @@ repositories:
   rebet:
     type: git
     url: https://github.com/EGAlberts/ReBeT.git
-    version: 7330e01
-
+    version: 2f1a84a

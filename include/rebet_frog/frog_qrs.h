@@ -212,7 +212,7 @@ class ObjectDetectionPowerQR : public TaskLevelQR
 
           if(objects_msg_vec[0].stamp != _obj_last_timestamp)
           {
-            for (const auto& obj_msg : objects_msg_vec) 
+            for (size_t i = 0; i < objects_msg_vec.size(); ++i)
             {
               pictures_taken+=(double)objects_msg_vec.size();
             }
@@ -434,7 +434,7 @@ class SimpleSystemPowerQR : public SystemLevelQR
     }
 
 
-    void initialize(float max_pics_ps, int window_length)
+    void initialize(float /*max_pics_ps*/, int window_length)
     {
         _window_length = window_length;
 
@@ -532,7 +532,7 @@ class SystemPowerQR : public SystemLevelQR
     }
 
 
-    void initialize(float max_pics_ps, int window_length)
+    void initialize(float /*max_pics_ps*/, int window_length)
     {
         _window_length = window_length;
 
@@ -817,9 +817,9 @@ class SafetyQR : public TaskLevelQR
 
           std::cout << "metric in safety " << _metric << std::endl; 
 
-          auto curr_time_pointer = std::chrono::system_clock::now();
+          // auto curr_time_pointer = std::chrono::system_clock::now();
 
-          int current_time = std::chrono::duration_cast<std::chrono::seconds>(curr_time_pointer.time_since_epoch()).count();
+          // int current_time = std::chrono::duration_cast<std::chrono::seconds>(curr_time_pointer.time_since_epoch()).count();
 
           output_metric();
           metric_mean();
