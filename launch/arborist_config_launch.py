@@ -16,6 +16,7 @@ def generate_launch_description():
             package='rebet_frog',
             executable='frog_arborist',
             name='frog_arborist_node',
+            output='screen',
             parameters=[config_file,{}]
         ),
     ])

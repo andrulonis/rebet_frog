@@ -4,6 +4,9 @@ from rclpy.action import ActionClient
 from rclpy.node import Node
 import sys
 from btcpp_ros2_interfaces.action import ExecuteTree
+import pandas as pd
+import json
+import time
 
 got_response = False
 
@@ -14,6 +17,8 @@ class TreeActionClient(Node):
         self._action_client = ActionClient(self, ExecuteTree, 'behavior_server')
 
         self.declare_parameter('autostart', True)
+
+        self.results = pd.DataFrame()
 
     def send_goal(self, tree_name):
         if(self.get_parameter("autostart").value or not input("Press enter to start")):
@@ -51,14 +56,16 @@ class TreeActionClient(Node):
         else:
             self.get_logger().info('Result: Done ticking BT, ended on Failure')
 
+        self.results.to_csv(str(int(time.time())) + '_results.csv')
+
         got_response = True
 
     
     def feedback_callback(self, feedback_msg):
         feedback = feedback_msg.feedback
-        self.get_logger().info('Received feedback: {0}'.format(feedback.message),throttle_duration_sec=1)
+        blackboard_json = json.loads(feedback.message)
 
-
+        self.results = pd.concat([self.results,pd.DataFrame([blackboard_json])])
 
 def main():
     if(len(sys.argv) < 2):
@@ -68,8 +75,6 @@ def main():
     rclpy.init()
 
     action_client = TreeActionClient()
-
-
 
     future = action_client.send_goal(str(sys.argv[1]))
 

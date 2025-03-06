@@ -41,7 +41,7 @@ class RobotPoseNode : public RosTopicSubNode<Odometry>
    */
     BT::NodeStatus onTick(const typename Odometry::SharedPtr& last_msg) override
     {
-        std::cout << "Inside robot_pose_sub " << std::endl;
+        // std::cout << "Inside robot_pose_sub " << std::endl;
         if(last_msg) {
             setOutput(POSE_OUT, *last_msg);
             return BT::NodeStatus::SUCCESS;

@@ -127,7 +127,7 @@ public:
         }
         
         std::vector<std::vector<int>> map_rows;
-        for (int x = 0; x < mission_map.data.size();x+=mission_map.info.width)
+        for (size_t x = 0; x < mission_map.data.size();x+=mission_map.info.width)
         {
             map_rows.push_back(std::vector<int>(mission_map.data.begin()+x, mission_map.data.begin()+x+mission_map.info.width));
         }
