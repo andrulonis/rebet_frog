@@ -14,7 +14,7 @@
 
 #include "rebet_frog/frog_constants.hpp"
 
-#include <tuple>
+#include "rebet_msgs/msg/qr.hpp"
 
 namespace BT
 {
@@ -374,6 +374,7 @@ class AdaptPictureRateInternal: public AdaptOnConditionOnStart<int>
 class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
 {
   public:
+    using QR_MSG = rebet_msgs::msg::QR;
 
     AdaptMaxSpeedExternal(const std::string& name, const NodeConfig& config) : AdaptPeriodicallyOnRunning<double>(name, config, AdaptationTarget::RosParameter, AdaptationType::External)
     {
@@ -414,6 +415,7 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
         InputPort<double>(POW_IN,"the power metric"),
         InputPort<double>(SAFE_IN,"the safety metric"),
         InputPort<double>(MOVE_IN,"the movement efficiency"),
+        InputPort<std::vector<QR_MSG>>(TASK_QRS_IN, "the task qrs"),
         OutputPort<double>(SPD_OUT,"the current chosen max speed"),
         
 
@@ -441,9 +443,14 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
     }
 
 
+    virtual std::vector<QR_MSG> collect_qrs()
+    {
+      std::vector<QR_MSG> current_qrs;
+      auto qr_res = getInput(TASK_QRS_IN, current_qrs);
+      return current_qrs;
+    }
 
-
-    virtual std::tuple<double,double, double, double> utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
+    virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
     {
       std::cout << "util_of_adap_max_speed" << std::endl;
       auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
@@ -459,9 +466,11 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
       double current_safety;
       double current_power;
       double current_move;
+      std::vector<QR_MSG> current_qrs;
       auto safe_res = getInput(SAFE_IN, current_safety);
       auto pow_res = getInput(POW_IN, current_power);
       auto move_res = getInput(MOVE_IN, current_move);
+      auto qr_res = getInput(TASK_QRS_IN, current_qrs);
 
  //if(current_power < 4.0 || current_safety > 0.15 || current_move < 0.40)
 
@@ -470,7 +479,7 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
         //MoveSafely is in violation.
         if(!is_safe(current_safety) && chosen_max_speed > 0.10)
         {
-          return std::make_tuple(0.0, current_safety, current_power, current_move);
+          return 0.0;
         }
         else
         {
@@ -484,16 +493,16 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
 
           if(utility < 0.0 || current_move < 0.0 || current_power < 0.0) //can happen if there's no values yet.
           {
-            return std::make_tuple(0.0, current_safety, current_power, current_move);
+            return 0.0;
           }
-          return std::make_tuple(utility, current_safety, current_power, current_move);
+          return 0.0;
         }
 
       }
       else
       {
         std::cout << "For some reason a value was not found in the blackboard" << std::endl;  
-        return std::make_tuple(0.0, 0.0, 0.0, 0.0);
+        return 0.0;
       }
 
     }
@@ -522,12 +531,15 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
     static constexpr const char* POW_IN = "in_power";
     static constexpr const char* SAFE_IN = "in_safety";
     static constexpr const char* MOVE_IN = "in_movement";
+    static constexpr const char* TASK_QRS_IN = "in_task_qrs";
     static constexpr const char* SPD_OUT = "report_speed";
     double PROXIMITY_SAFETY_THRESHOLD = 0.10;
     double power_qr_max_value;
 
 
 };
+
+
 
 
 class AdaptMaxSpeedInternal : public AdaptPeriodicallyOnRunning<double>
