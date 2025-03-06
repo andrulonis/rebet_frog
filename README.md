@@ -44,9 +44,9 @@ pip install masced_bandits
 colcon build --symlink-install
 ```
 
-6. (TEMPORARY STEP) Download [PRISM](https://www.prismmodelchecker.org/manual/InstallingPRISM/Instructions), place it in `~/rebet_ws` and run the following:
+6. (TEMPORARY STEP) Download [PRISM](https://www.prismmodelchecker.org/manual/InstallingPRISM/Instructions) (binary of version 4.8.1 also available [here](https://github.com/prismmodelchecker/prism/releases)), extract it in `~/rebet_ws` and run the following:
 ```bash
-cd ~/rebet_ws/{prism_dir}
+cd ~/rebet_ws/prism-4.8.1-linux64-x86
 ./install.sh
 ```
 
