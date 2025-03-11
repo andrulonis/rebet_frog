@@ -24,6 +24,7 @@
   <depend>ultralytics</depend>
   <depend>aal_msgs</depend>
   <depend>rebet</depend>
+  <depend>diagnostic_msgs</depend>
 
 
 

@@ -25,6 +25,7 @@ find_package(lifecycle_msgs REQUIRED)
 find_package(wavefront_frontier_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(aal_msgs REQUIRED)
+find_package(diagnostic_msgs REQUIRED)
 
 set(THIS_PACKAGE_DEPS
     rclcpp
@@ -41,7 +42,8 @@ set(THIS_PACKAGE_DEPS
     rebet
     slam_toolbox
     wavefront_frontier_msgs
-    aal_msgs)
+    aal_msgs
+    diagnostic_msgs)
 
 # Include Cpp "include" directory
 include_directories(include)

@@ -15,6 +15,7 @@
 #include "rebet_frog/frog_constants.hpp"
 
 #include "rebet_msgs/msg/qr.hpp"
+#include "diagnostic_msgs/msg/key_value.hpp"
 
 namespace BT
 {
@@ -22,6 +23,8 @@ namespace BT
 class AdaptPictureRateExternal: public AdaptOnConditionOnStart<int>
 {
   public:
+    using QR_MSG = rebet_msgs::msg::QR;
+    using KV_MSG = diagnostic_msgs::msg::KeyValue;
 
     AdaptPictureRateExternal(const std::string& name, const NodeConfig& config) : AdaptOnConditionOnStart<int>(name, config, AdaptationTarget::RosParameter, AdaptationType::External)
     {
@@ -36,11 +39,89 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<int>
       PortsList base_ports = AdaptOnConditionOnStart::providedPorts();
 
       PortsList child_ports =  {
-              };
+        InputPort<std::vector<std::string>>(ADAP_SUB, "The name of the thing you adapt"), //overwrite to have multiple.
+        InputPort<double>(POW_IN,"the power metric"),
+        OutputPort<int>(OUT_PIC,"chosen pic_rate"),
+        OutputPort<std::string>(OUT_CAM,"current camera topic"),
+        InputPort<std::vector<double>>(PICTASK_IN,"the det obj task metric"),
+        InputPort<int>(TOT_OBS, "how many obstacles there are"),
+        InputPort<rebet::SystemAttributeValue>(IN_LIGHT,"lighting message wrapped in a systemattributevalue instance"),     
+        InputPort<std::vector<QR_MSG>>(TASK_QRS_IN, "the task qrs"),   
+      };
       child_ports.merge(base_ports);
 
       return child_ports;
     }
+
+    virtual std::vector<QR_MSG> collect_qrs()
+    {
+      std::vector<QR_MSG> current_qrs;
+      auto qr_res = getInput(TASK_QRS_IN, current_qrs);
+      return current_qrs;
+    }
+
+    virtual std::vector<KV_MSG> collect_context()
+    {
+      std::vector<KV_MSG> current_context = {};
+      int num_obstacles;
+      rebet::SystemAttributeValue current_lighting;
+      auto obstacles_res = getInput(TOT_OBS, num_obstacles);
+      auto lighting_res = getInput(IN_LIGHT, current_lighting);
+      
+      auto kv_obstacles = KV_MSG();
+      kv_obstacles.key = "obstacles";
+      kv_obstacles.value = std::to_string(num_obstacles);
+      current_context.push_back(kv_obstacles);
+
+      auto kv_lighting = KV_MSG();
+      kv_lighting.key = "darkness";
+      kv_lighting.value = std::to_string(current_lighting.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data);
+      current_context.push_back(kv_lighting);
+
+      return current_context;
+    }
+
+    virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
+    {
+      std::cout << "util_of_adap_cam_rate" << std::endl;
+      auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
+
+      std::vector<double> chosen_rates = parameter_object.get<std::vector<double>>();
+
+      double chosen_cam_rate = chosen_rates[0];
+
+      setOutput(OUT_PIC, chosen_cam_rate);
+      setOutput(OUT_CAM, 1);
+      return 0.0;
+    }
+
+    private:
+      static constexpr const char* POW_IN = "in_power";
+      static constexpr const char* PICTASK_IN = "in_pictask";
+      static constexpr const char* TOT_OBS = "obstacles_total";
+      static constexpr const char* OUT_PIC = "out_pic_rate";
+      static constexpr const char* OUT_CAM = "out_cam_top";
+      static constexpr const char* ROT = "rotations_done";
+      static constexpr const char* IN_LIGHT = "lighting_in";
+      static constexpr const char* TASK_QRS_IN = "in_task_qrs";
+
+      std::string ALT_CAMERA_TOPIC = "/corner_camera/image_raw";
+      std::string OG_CAMERA_TOPIC = "/camera/image_noisy";
+
+      rebet::SystemAttributeValue _light_attribute;
+      std::string detected = std::string(OBJECT_DETECTED_STRING);
+      std::string current_image_feed;
+      int _current_pic_rate = START_PIC_RATE;
+      const int IND_PARAM_TOPIC = 1;
+      const int IND_PARAM_NUM = 0;
+
+      int _max_pic_rate = START_PIC_RATE + PIC_INCREMENT;
+      int rotations_done = 0;
+      int _pictures_taken;
+      double _power_consumed;
+
+      int _obs_taken_pictures_of = 0;
+      FixedQueue<std::string, PIC_INCREMENT> objs_detected;
 };
 
 class FromExploreToIdentify: public AdaptOnConditionOnStart<int>
@@ -466,11 +547,9 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
       double current_safety;
       double current_power;
       double current_move;
-      std::vector<QR_MSG> current_qrs;
       auto safe_res = getInput(SAFE_IN, current_safety);
       auto pow_res = getInput(POW_IN, current_power);
       auto move_res = getInput(MOVE_IN, current_move);
-      auto qr_res = getInput(TASK_QRS_IN, current_qrs);
 
  //if(current_power < 4.0 || current_safety > 0.15 || current_move < 0.40)
 
