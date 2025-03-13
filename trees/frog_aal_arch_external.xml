@@ -40,7 +40,7 @@
 						<Repeat num_cycles="5">
 							<DetectObjectsSavePower weight="{obj_power_weight}" obstacles_total="{num_obstacles}" metric="{@obj_power_metric}" objs_identified="{objects_detected}" mean_metric="{obj_pow_mean_metric}">
 							<DetectObjectsEfficiently weight="{task_weight}" objs_identified="{objects_detected}" metric="{@task_metric}" mean_metric="{task_mean_metric}" out_status="{obj_task_state}" >
-								<AdaptPictureRate in_task_qrs="{@task_level_qrs}" adaptation_strategy="prism_strategy" adaptation_options="1;2;3" adaptation_subject="num_predictions;image_topic_name" subject_location="detect_object" in_power="{@obj_power_metric}" in_pictask="{@task_metric}" obstacles_total="{num_obstacles}" lighting_in="{@current_lighting}" out_pic_rate="{@pic_rate}" out_cam_top="{@cam_feed}">
+								<AdaptPictureRate in_task_qrs="{@task_level_qrs}" adaptation_strategy="prism_strategy" adaptation_options="1,2,3;internal,external" adaptation_subject="num_predictions;image_topic_name" subject_location="detect_object" in_power="{@obj_power_metric}" in_pictask="{@task_metric}" obstacles_total="{num_obstacles}" lighting_in="{@current_lighting}" out_pic_rate="{@pic_rate}" out_cam_top="{@cam_feed}">
 									<NewIDObj pictures_taken="{@rep_pic_take}" number_detected="{rep_num_ob}" service_name="/detect_object_srv" objs_identified="{objects_detected}" name_of_task="{@current_task}"/>
 								</AdaptPictureRate>
 							</DetectObjectsEfficiently>

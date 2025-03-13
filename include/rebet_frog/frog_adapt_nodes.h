@@ -20,16 +20,56 @@
 namespace BT
 {
 
-class AdaptPictureRateExternal: public AdaptOnConditionOnStart<int>
+class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
 {
   public:
     using QR_MSG = rebet_msgs::msg::QR;
     using KV_MSG = diagnostic_msgs::msg::KeyValue;
 
-    AdaptPictureRateExternal(const std::string& name, const NodeConfig& config) : AdaptOnConditionOnStart<int>(name, config, AdaptationTarget::RosParameter, AdaptationType::External)
+    AdaptPictureRateExternal(const std::string& name, const NodeConfig& config) : AdaptOnConditionOnStart<std::string>(name, config, AdaptationTarget::RosParameter, AdaptationType::External)
     {
       _condition_default = true;
-      registerAdaptations();
+      
+      // TODO: Make this not ugly
+      std::string param_values_string;
+      std::string param_name_string;
+      std::string node_name;
+      getInput(ADAP_OPT, param_values_string);
+      getInput(ADAP_SUB, param_name_string);
+      getInput(ADAP_LOC, node_name);
+
+      auto all_param_values = splitString(param_values_string, ';');
+      auto rate_param_values_string = all_param_values[0];
+      auto rate_param_values = splitString(rate_param_values_string, ',');
+      auto topic_param_values_string = all_param_values[1];
+      auto topic_param_values = splitString(topic_param_values_string, ',');
+
+      auto param_names = splitString(param_name_string, ';');
+
+      aal_msgs::msg::AdaptationOptions rate_variable_param = aal_msgs::msg::AdaptationOptions();
+      aal_msgs::msg::AdaptationOptions topic_variable_param = aal_msgs::msg::AdaptationOptions();
+
+      
+      rate_variable_param.name = param_names[0];
+      rate_variable_param.node_name = node_name;
+      rate_variable_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
+      for (const StringView& val : rate_param_values) {
+        int int_val = convertFromString<int>(val);
+        rclcpp::ParameterValue par_val = rclcpp::ParameterValue(int_val);
+        rate_variable_param.possible_values.push_back(par_val.to_value_msg());
+      }
+
+      topic_variable_param.name = param_names[1];
+      topic_variable_param.node_name = node_name;
+      topic_variable_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
+      for (const StringView& val : topic_param_values) {
+        std::string string_val = convertFromString<std::string>(val);
+        rclcpp::ParameterValue par_val = rclcpp::ParameterValue(string_val);
+        topic_variable_param.possible_values.push_back(par_val.to_value_msg());
+      }
+
+      _var_params.push_back(rate_variable_param); //vector of VariableParameter   
+      _var_params.push_back(topic_variable_param); //vector of VariableParameter   
 
       //If you overwrite tick, and do this at different moments you can change the adaptation options at runtime.  
     }
@@ -65,18 +105,46 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<int>
       std::vector<KV_MSG> current_context = {};
       int num_obstacles;
       rebet::SystemAttributeValue current_lighting;
+      std::vector<double> pic_task;
+      double remaining_power_budget;
+
       auto obstacles_res = getInput(TOT_OBS, num_obstacles);
       auto lighting_res = getInput(IN_LIGHT, current_lighting);
+      auto pick_task_res = getInput(PICTASK_IN, pic_task);
+      auto pow_budget_res = getInput(POW_IN, remaining_power_budget);
       
-      auto kv_obstacles = KV_MSG();
-      kv_obstacles.key = "obstacles";
-      kv_obstacles.value = std::to_string(num_obstacles);
-      current_context.push_back(kv_obstacles);
+      if (obstacles_res) {
+        auto kv_obstacles = KV_MSG();
+        kv_obstacles.key = "obstacles";
+        kv_obstacles.value = std::to_string(num_obstacles);
+        current_context.push_back(kv_obstacles);
+      }
 
-      auto kv_lighting = KV_MSG();
-      kv_lighting.key = "darkness";
-      kv_lighting.value = std::to_string(current_lighting.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data);
-      current_context.push_back(kv_lighting);
+      if (lighting_res) {
+        auto kv_lighting = KV_MSG();
+        kv_lighting.key = "darkness";
+        kv_lighting.value = std::to_string(current_lighting.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data);
+        current_context.push_back(kv_lighting);
+      }
+
+      if (pick_task_res) {
+        auto kv_obs_detected = KV_MSG();
+        kv_obs_detected.key = "obs_detected";
+        kv_obs_detected.value = std::to_string(pic_task[0]);
+        current_context.push_back(kv_obs_detected);  
+
+        auto kv_pics_taken = KV_MSG();
+        kv_pics_taken.key = "pics_taken";
+        kv_pics_taken.value = std::to_string(pic_task[1]);
+        current_context.push_back(kv_pics_taken);
+      }
+
+      if (pow_budget_res) {
+        auto kv_power_budget = KV_MSG();
+        kv_power_budget.key = "power_budget";
+        kv_power_budget.value = std::to_string(remaining_power_budget);
+        current_context.push_back(kv_power_budget);
+      }
 
       return current_context;
     }
@@ -86,12 +154,9 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<int>
       std::cout << "util_of_adap_cam_rate" << std::endl;
       auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
 
-      std::vector<double> chosen_rates = parameter_object.get<std::vector<double>>();
 
-      double chosen_cam_rate = chosen_rates[0];
-
-      setOutput(OUT_PIC, chosen_cam_rate);
-      setOutput(OUT_CAM, 1);
+      setOutput(OUT_PIC, 1);
+      setOutput(OUT_CAM, OG_CAMERA_TOPIC);
       return 0.0;
     }
 
