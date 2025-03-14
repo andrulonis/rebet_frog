@@ -38,6 +38,47 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       getInput(ADAP_SUB, param_name_string);
       getInput(ADAP_LOC, node_name);
 
+      // Expected structure of adaptation_options string is "[minrate]-[maxrate],[topicname];[minrate-maxrate],[topicname]"
+
+      // auto all_param_names = splitString(param_name_string, ';');
+
+      // auto all_param_pairs = splitString(param_values_string, ';');
+      // for (auto param_pair : all_param_pairs) {
+      //   auto split_pair = splitString(param_pair, ',');
+      //   auto rate_limits = split_pair[0];
+      //   auto topic = split_pair[1];
+      //   auto split_rates = splitString(rate_limits, '-');
+      //   auto min_rate = convertFromString<int>(split_rates[0]);
+      //   auto max_rate = convertFromString<int>(split_rates[1]);
+      //   std::vector<int> rates;
+        
+      //   for (int i = min_rate; i <= max_rate; ++i) {
+      //     rates.push_back(i);
+      //   }
+
+      //   aal_msgs::msg::AdaptationOptions rate_param = aal_msgs::msg::AdaptationOptions();
+      //   rate_param.name = all_param_names[0];
+      //   rate_param.node_name = node_name;
+      //   rate_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
+
+      //   for (int val : rates) {
+      //     rclcpp::ParameterValue par_val = rclcpp::ParameterValue(val);
+      //     rate_param.possible_values.push_back(par_val.to_value_msg());
+      //   }
+
+      //   aal_msgs::msg::AdaptationOptions topic_param = aal_msgs::msg::AdaptationOptions();
+      //   topic_param.name = all_param_names[1];
+      //   topic_param.node_name = node_name;
+      //   topic_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
+
+      //   std::string string_val = convertFromString<std::string>(topic);
+      //   rclcpp::ParameterValue par_val = rclcpp::ParameterValue(string_val);
+      //   topic_param.possible_values.push_back(par_val.to_value_msg());
+
+      //   _var_params.push_back(rate_param); //vector of VariableParameter   
+      //   _var_params.push_back(topic_param); //vector of VariableParameter 
+      // }
+
       auto all_param_values = splitString(param_values_string, ';');
       auto rate_param_values_string = all_param_values[0];
       auto rate_param_values = splitString(rate_param_values_string, ',');
@@ -64,7 +105,8 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       topic_variable_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
       for (const StringView& val : topic_param_values) {
         std::string string_val = convertFromString<std::string>(val);
-        rclcpp::ParameterValue par_val = rclcpp::ParameterValue(string_val);
+        bool bool_val = string_val == OG_CAMERA_TOPIC;
+        rclcpp::ParameterValue par_val = rclcpp::ParameterValue(bool_val);
         topic_variable_param.possible_values.push_back(par_val.to_value_msg());
       }
 
@@ -147,6 +189,13 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       }
 
       return current_context;
+    }
+
+    virtual bool evaluate_condition()
+    {
+      setOutput(OUT_PIC, _current_pic_rate);
+      setOutput(OUT_CAM, current_image_feed);
+      return true;
     }
 
     virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
