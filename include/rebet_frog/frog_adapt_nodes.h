@@ -73,8 +73,7 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       topic_variable_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
       for (const StringView& val : topic_param_values) {
         std::string string_val = convertFromString<std::string>(val);
-        bool bool_val = string_val == OG_CAMERA_TOPIC;
-        rclcpp::ParameterValue par_val = rclcpp::ParameterValue(bool_val);
+        rclcpp::ParameterValue par_val = rclcpp::ParameterValue(string_val);
         topic_variable_param.possible_values.push_back(par_val.to_value_msg());
       }
 
@@ -159,18 +158,19 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       return current_context;
     }
 
-    virtual bool evaluate_condition()
-    {
-      setOutput(OUT_PIC, _current_pic_rate);
-      setOutput(OUT_CAM, current_image_feed);
-      return true;
-    }
+    // virtual bool evaluate_condition()
+    // {
+    //   setOutput(OUT_PIC, _current_pic_rate);
+    //   setOutput(OUT_CAM, current_image_feed);
+    //   return true;
+    // }
 
     virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
     {
       std::cout << "util_of_adap_cam_rate" << std::endl;
       auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
 
+      // params = parameter_object.get<>();
 
       setOutput(OUT_PIC, 1);
       setOutput(OUT_CAM, OG_CAMERA_TOPIC);
