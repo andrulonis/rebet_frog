@@ -158,25 +158,6 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       return current_context;
     }
 
-    // virtual bool evaluate_condition()
-    // {
-    //   setOutput(OUT_PIC, _current_pic_rate);
-    //   setOutput(OUT_CAM, current_image_feed);
-    //   return true;
-    // }
-
-    virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
-    {
-      std::cout << "util_of_adap_cam_rate" << std::endl;
-      auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
-
-      // params = parameter_object.get<>();
-
-      setOutput(OUT_PIC, 1);
-      setOutput(OUT_CAM, OG_CAMERA_TOPIC);
-      return 0.0;
-    }
-
     private:
       static constexpr const char* POW_IN = "in_power";
       static constexpr const char* PICTASK_IN = "in_pictask";
