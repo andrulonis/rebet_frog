@@ -102,14 +102,14 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       return child_ports;
     }
 
-    virtual std::vector<QR_MSG> collect_qrs()
+    virtual std::vector<QR_MSG> collect_qrs() override
     {
       std::vector<QR_MSG> current_qrs;
       auto qr_res = getInput(TASK_QRS_IN, current_qrs);
       return current_qrs;
     }
 
-    virtual std::vector<KV_MSG> collect_context()
+    virtual std::vector<KV_MSG> collect_context() override
     {
       std::vector<KV_MSG> current_context = {};
       int num_obstacles;
@@ -156,6 +156,20 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       }
 
       return current_context;
+    }
+
+    virtual void set_outputs(aal_msgs::msg::Adaptation given_adaptation) override
+    {
+      auto parameter_object = rclcpp::ParameterValue(given_adaptation.parameter_adaptation.value);
+      if (parameter_object.get_type() == 2) {
+        int chosen_rate = parameter_object.get<int>();
+        setOutput(OUT_PIC, chosen_rate);
+      } 
+      else if (parameter_object.get_type() == 4) {
+        std::string chosen_cam = parameter_object.get<std::string>();
+        setOutput(OUT_CAM, chosen_cam);
+      }
+      return;
     }
 
     private:
@@ -587,7 +601,7 @@ class AdaptMaxSpeedExternal : public AdaptPeriodicallyOnRunning<double>
     }
 
 
-    virtual std::vector<QR_MSG> collect_qrs()
+    virtual std::vector<QR_MSG> collect_qrs() override
     {
       std::vector<QR_MSG> current_qrs;
       auto qr_res = getInput(TASK_QRS_IN, current_qrs);
