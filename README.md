@@ -72,6 +72,17 @@ ros2 run aal adaptation_layer
 ```
 For providing architectural adaptations of ROS2 Nodes.
 
+If you wish to provide your own PRISM model and properties, use this command instead:
+```bash
+ros2 run aal adaptation_layer --ros-args -p model_dir:="/absolute/path/to/model/dir"
+```
+where the model directory contains three files: `base_model.pm`, `properties.pctl` and `required_vars.txt`.
+The .txt file requires you to list all the variables used in the model and the properties. If the variable is of string type, you also need to list all the possible values and then they will be treated as an int value, similar to an enum. This arises from the limitation of PRISM not supporting strings. The file structure should look as follows:
+```
+int_var_name
+string_var_name str_value1 str_value2
+```
+
 ### System Reflection
 ```bash
 ros2 run rebet_frog system_reflection.py

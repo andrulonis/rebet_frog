@@ -456,44 +456,46 @@ class AdaptPictureRateInternal: public AdaptOnConditionOnStart<int>
 
       }
 
-      if(task_res && pow_budget_res && curr_light_res)
-      {
-        float current_darkness = _light_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data;
-        if(remaining_power_budget < 0.0)
-        {
-          return change_camera_feed(ALT_CAMERA_TOPIC);
-        }
-        if((current_darkness) > 0.70)
-        {
-          std::cout << "got this far darkness" << std::endl;
+      return change_camera_feed(ALT_CAMERA_TOPIC);
 
-            double total_pics_quota = (double)obs_num * 5; //5 is the repeat in the BT specified.
+      // if(task_res && pow_budget_res && curr_light_res)
+      // {
+      //   float current_darkness = _light_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_FLOAT>().data;
+      //   if(remaining_power_budget < 0.0)
+      //   {
+      //     return change_camera_feed(ALT_CAMERA_TOPIC);
+      //   }
+      //   if((current_darkness) > 0.70)
+      //   {
+      //     std::cout << "got this far darkness" << std::endl;
 
-            double pics_left = total_pics_quota - objects_visited; //quota minus conusmed.
-            double extra_power_consumed = PIC_INCREMENT * DETECTION_AVG_POW;
+      //       double total_pics_quota = (double)obs_num * 5; //5 is the repeat in the BT specified.
 
-            double power_needed_after = (double)pics_left * DETECTION_AVG_POW; //Power still necessary to take 5 picture of each obj
+      //       double pics_left = total_pics_quota - objects_visited; //quota minus conusmed.
+      //       double extra_power_consumed = PIC_INCREMENT * DETECTION_AVG_POW;
 
-            double power_to_be_used = power_needed_after + extra_power_consumed;
+      //       double power_needed_after = (double)pics_left * DETECTION_AVG_POW; //Power still necessary to take 5 picture of each obj
 
-            std::cout << "power to be used " << power_to_be_used << std::endl;
-            if(remaining_power_budget >= power_to_be_used && remaining_power_budget > 0.0) 
-            {
-              //While there's still budget we prefer getting the more useful detection from the robot
-              return increased_pic_rate() || change_camera_feed(OG_CAMERA_TOPIC); //The latter is just in case the ext. camera is in use right now
-            }
-            else
-            {
-              //if there's no budget and its noisy, we use the alternative camera.
-              return change_camera_feed(ALT_CAMERA_TOPIC);
-            }
+      //       double power_to_be_used = power_needed_after + extra_power_consumed;
+
+      //       std::cout << "power to be used " << power_to_be_used << std::endl;
+      //       if(remaining_power_budget >= power_to_be_used && remaining_power_budget > 0.0) 
+      //       {
+      //         //While there's still budget we prefer getting the more useful detection from the robot
+      //         return increased_pic_rate() || change_camera_feed(OG_CAMERA_TOPIC); //The latter is just in case the ext. camera is in use right now
+      //       }
+      //       else
+      //       {
+      //         //if there's no budget and its noisy, we use the alternative camera.
+      //         return change_camera_feed(ALT_CAMERA_TOPIC);
+      //       }
           
-        }
-        else { 
-          //If it isn't noisy, we conservatively use the robot's camera.
-          return (set_pic_rate(START_PIC_RATE) || change_camera_feed(OG_CAMERA_TOPIC));
-          }
-      }
+      //   }
+      //   else { 
+      //     //If it isn't noisy, we conservatively use the robot's camera.
+      //     return (set_pic_rate(START_PIC_RATE) || change_camera_feed(OG_CAMERA_TOPIC));
+      //     }
+      // }
 
       return false;
     }

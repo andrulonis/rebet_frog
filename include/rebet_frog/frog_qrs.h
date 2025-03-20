@@ -270,6 +270,7 @@ class ObjectDetectionPowerQR : public TaskLevelQR
 
       PortsList child_ports =  {
               InputPort<std::vector<rebet_msgs::msg::ObjectsIdentified>>(IN_OBJ,"The objects detected through the robot's camera"),
+              InputPort<std::string>(IN_TOPIC, "Topic camera used to take the pictures (affects battery draw)"),
               InputPort<int>(TOT_OBS, "how many obstacles there are"),
               };
       child_ports.merge(base_ports);
@@ -285,7 +286,18 @@ class ObjectDetectionPowerQR : public TaskLevelQR
       {
         // std::cout << " pos result proctaskprogress object det power qr" << std::endl;
         std::cout << "pictures taken since last budget update apparently " << pictures_taken << std::endl;
-        _power_budget = _power_budget - (pictures_taken * DETECTION_AVG_POW);
+
+        std::string topic_used;
+        getInput(IN_TOPIC, topic_used);
+
+        if (topic_used == "/camera/image_noisy"){
+
+          _power_budget = _power_budget - (pictures_taken * DETECTION_AVG_POW);
+        }
+        else if (topic_used == "/corner_camera/image_raw"){
+          _power_budget = _power_budget - (pictures_taken * DETECTION_AVG_POW_EXT);
+        }
+
         _metric = _power_budget;
         pictures_taken = 0.0;
         output_metric();
@@ -311,8 +323,7 @@ class ObjectDetectionPowerQR : public TaskLevelQR
 
       
 
-
-
+      static constexpr const char* IN_TOPIC = "in_cam_top";
       static constexpr const char* IN_PIC_RATE = "in_picture_rate";
       static constexpr const char* IN_OBJ = "objs_identified";
       static constexpr const char* TOT_OBS = "obstacles_total";

@@ -4,6 +4,7 @@
 #include <math.h>
 
 inline constexpr double DETECTION_AVG_POW = 59.275; //watts
+inline constexpr double DETECTION_AVG_POW_EXT = 5.9275; //watts, estimation, could be updated in future.
 
 inline constexpr const char* OBJECT_DETECTED_STRING = "DETECTED";
 inline constexpr const char* OBJECT_NOT_DETECTED_STRING = "NOT_DETECTED";
