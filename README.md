@@ -44,9 +44,9 @@ pip install masced_bandits
 colcon build --symlink-install
 ```
 
-6. (TEMPORARY STEP) Download [PRISM](https://www.prismmodelchecker.org/manual/InstallingPRISM/Instructions) (binary of version 4.8.1 also available [here](https://github.com/prismmodelchecker/prism/releases)), extract it in `~/rebet_ws` and run the following:
+6. Required for using [PRISM](https://www.prismmodelchecker.org) adaptation:
 ```bash
-cd ~/rebet_ws/prism-4.8.1-linux64-x86
+cd ~/rebet_ws/aal/prism-4.8.1-linux64-x86
 ./install.sh
 ```
 
@@ -76,12 +76,14 @@ If you wish to provide your own PRISM model and properties, use this command ins
 ```bash
 ros2 run aal adaptation_layer --ros-args -p model_dir:="/absolute/path/to/model/dir"
 ```
-where the model directory contains three files: `base_model.pm`, `properties.pctl` and `required_vars.txt`.
+where the model directory contains four files: `base_model.pm`, `properties.pctl`, `required_vars.txt` and `utility_function.py`.
 The .txt file requires you to list all the variables used in the model and the properties. If the variable is of string type, you also need to list all the possible values and then they will be treated as an int value, similar to an enum. This arises from the limitation of PRISM not supporting strings. The file structure should look as follows:
 ```
 int_var_name
 string_var_name str_value1 str_value2
 ```
+
+The .py file should define a function named calculate_utility(porp_results), which takes as argument a list corresponding to the results of the properties defined in the properties file. It should return a floating point number indicating the utility associated to the results of the properties.
 
 ### System Reflection
 ```bash
