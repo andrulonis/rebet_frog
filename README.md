@@ -46,7 +46,7 @@ colcon build --symlink-install
 
 6. Required for using [PRISM](https://www.prismmodelchecker.org) adaptation:
 ```bash
-cd ~/rebet_ws/aal/prism-4.8.1-linux64-x86
+cd ~/rebet_ws/src/aal/prism-4.8.1-linux64-x86
 ./install.sh
 ```
 
