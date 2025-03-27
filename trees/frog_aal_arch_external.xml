@@ -22,8 +22,6 @@
 			<!-- <FromExploreToIdentify subject_location="detect_object;get_frontier_service"> -->
 			<Sleep msec="1000"/>
 			<!-- </FromExploreToIdentify> -->
-				<Repeat num_cycles="-1">
-
 				<Repeat num_cycles="{num_obstacles}">
 					<Parallel>
 						<SafetyQR weight="{safe_weight}" metric="{@safe_metric}" mean_metric="{safe_mean_metric}" in_laser_scan="{@laser_scan}">
@@ -48,10 +46,6 @@
 						</Repeat>
 					</Parallel>
 				</Repeat>
-
-				</Repeat>
-
-
 		</Sequence>
   </BehaviorTree>
 </root>
