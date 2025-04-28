@@ -30,7 +30,6 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
     {
       _condition_default = true;
       
-      // TODO: Make this not ugly
       std::string param_values_string;
       std::string param_name_string;
       std::string node_name;
@@ -91,11 +90,13 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
         InputPort<std::vector<std::string>>(ADAP_SUB, "The name of the thing you adapt"), //overwrite to have multiple.
         InputPort<double>(POW_IN,"the power metric"),
         OutputPort<int>(OUT_PIC,"chosen pic_rate"),
-        OutputPort<std::string>(OUT_CAM,"current camera topic"),
+        OutputPort<std::string>(OUT_CAM,"chosen camera topic"),
         InputPort<std::vector<double>>(PICTASK_IN,"the det obj task metric"),
         InputPort<int>(TOT_OBS, "how many obstacles there are"),
         InputPort<rebet::SystemAttributeValue>(IN_LIGHT,"lighting message wrapped in a systemattributevalue instance"),     
         InputPort<std::vector<QR_MSG>>(TASK_QRS_IN, "the task qrs"),   
+        InputPort<int>(IN_PIC,"current pic_rate"),
+        InputPort<std::string>(IN_CAM,"current camera topic"),
       };
       child_ports.merge(base_ports);
 
@@ -107,6 +108,32 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       std::vector<QR_MSG> current_qrs;
       auto qr_res = getInput(TASK_QRS_IN, current_qrs);
       return current_qrs;
+    }
+
+    virtual std::vector<KV_MSG> collect_config() override
+    {
+      std::vector<KV_MSG> current_config;
+      int pic_rate;
+      std::string cam_feed;
+
+      auto pic_rate_res = getInput(IN_PIC, pic_rate);
+      auto cam_feed_res = getInput(IN_CAM, cam_feed);
+      
+      if (pic_rate_res) {
+        auto kv_pic_rate = KV_MSG();
+        kv_pic_rate.key = "pic_rate";
+        kv_pic_rate.value = std::to_string(pic_rate);
+        current_config.push_back(kv_pic_rate);
+      }
+
+      if (cam_feed_res) {
+        auto kv_cam_feed = KV_MSG();
+        kv_cam_feed.key = "cam_feed";
+        kv_cam_feed.value = cam_feed;
+        current_config.push_back(kv_cam_feed);
+      }
+
+      return current_config;
     }
 
     virtual std::vector<KV_MSG> collect_context() override
@@ -177,7 +204,9 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       static constexpr const char* PICTASK_IN = "in_pictask";
       static constexpr const char* TOT_OBS = "obstacles_total";
       static constexpr const char* OUT_PIC = "out_pic_rate";
+      static constexpr const char* IN_PIC = "in_pic_rate";
       static constexpr const char* OUT_CAM = "out_cam_top";
+      static constexpr const char* IN_CAM = "in_cam_top";
       static constexpr const char* ROT = "rotations_done";
       static constexpr const char* IN_LIGHT = "lighting_in";
       static constexpr const char* TASK_QRS_IN = "in_task_qrs";
