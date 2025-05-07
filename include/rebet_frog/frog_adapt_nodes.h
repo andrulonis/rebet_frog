@@ -115,10 +115,25 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
       std::vector<KV_MSG> current_config;
       int pic_rate;
       std::string cam_feed;
+      std::vector<double> pic_task;
 
       auto pic_rate_res = getInput(IN_PIC, pic_rate);
       auto cam_feed_res = getInput(IN_CAM, cam_feed);
-      
+      auto pic_task_res = getInput(PICTASK_IN, pic_task);
+   
+      if (cam_feed_res) {
+        auto kv_cam_feed = KV_MSG();
+        kv_cam_feed.key = "cam_feed";
+        // Fuzzify data
+        if (cam_feed == "/camera/image_noisy") {
+          kv_cam_feed.value = "0";
+        }
+        else {
+          kv_cam_feed.value = "1";
+        }
+        current_config.push_back(kv_cam_feed);
+      }
+   
       if (pic_rate_res) {
         auto kv_pic_rate = KV_MSG();
         kv_pic_rate.key = "pic_rate";
@@ -126,11 +141,17 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
         current_config.push_back(kv_pic_rate);
       }
 
-      if (cam_feed_res) {
-        auto kv_cam_feed = KV_MSG();
-        kv_cam_feed.key = "cam_feed";
-        kv_cam_feed.value = cam_feed;
-        current_config.push_back(kv_cam_feed);
+      if (pic_task_res) {
+        auto kv_pic_task = KV_MSG();
+        kv_pic_task.key = "pictures";
+        // Fuzzify data
+        if (pic_task[1] >= 10.00) {
+          kv_pic_task.value = "10";
+        }
+        else {
+          kv_pic_task.value = std::to_string(int(pic_task[1]));
+        }
+        current_config.push_back(kv_pic_task);
       }
 
       return current_config;
@@ -146,7 +167,7 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
 
       auto obstacles_res = getInput(TOT_OBS, num_obstacles);
       auto lighting_res = getInput(IN_LIGHT, current_lighting);
-      auto pick_task_res = getInput(PICTASK_IN, pic_task);
+      auto pic_task_res = getInput(PICTASK_IN, pic_task);
       auto pow_budget_res = getInput(POW_IN, remaining_power_budget);
       
       if (obstacles_res) {
@@ -163,7 +184,7 @@ class AdaptPictureRateExternal: public AdaptOnConditionOnStart<std::string>
         current_context.push_back(kv_lighting);
       }
 
-      if (pick_task_res) {
+      if (pic_task_res) {
         auto kv_obs_detected = KV_MSG();
         kv_obs_detected.key = "obs_detected";
         kv_obs_detected.value = std::to_string(pic_task[0]);
