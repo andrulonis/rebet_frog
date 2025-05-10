@@ -321,8 +321,6 @@ class ObjectDetectionPowerQR : public TaskLevelQR
       builtin_interfaces::msg::Time _obj_last_timestamp;
 
 
-      
-
       static constexpr const char* IN_TOPIC = "in_cam_top";
       static constexpr const char* IN_PIC_RATE = "in_picture_rate";
       static constexpr const char* IN_OBJ = "objs_identified";
