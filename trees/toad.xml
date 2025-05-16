@@ -1,0 +1,32 @@
+<root BTCPP_format="4" main_tree_to_execute="TOAD">
+	<include ros_pkg="rebet_frog" path="trees/frog_task_based.xml"/>
+  	<BehaviorTree ID="TOAD">
+	
+		<Sequence>
+			<Script code="task_weight:=1.0; obj_power_weight:=1.0; @obj_power_metric:=-10.0; move_pow_weight:=1.0; @move_pow_metric:=-10.0; move_eff_weight:=1.0; @move_eff_metric:=-10.0; safe_weight:=1.0; @safe_metric:=-10.0"/>
+		
+			<!-- <SubTree ID="SLAMandCharge"/> -->
+			<Sleep msec="3000"/> 
+			<RetryUntilSuccessful num_attempts="-1">
+				<getRobotPose topic_name="/odom" out_pose="{current_pose}" />
+			</RetryUntilSuccessful>
+
+			<initialPose topic_name="initialpose" in_pose="{current_pose}" />
+			<Sleep msec="3000"/>
+			
+			<RetryUntilSuccessful num_attempts="-1">
+				<getMap service_name="/map_server/map" map_retrieved="{current_map}"/>
+			</RetryUntilSuccessful>
+			
+			<filterObstacles map_to_filter="{current_map}" obstacle_positions="{route_poses}" obstacle_number="{num_obstacles}"/>
+			<Sleep msec="1000"/>
+            <Repeat num_cycles="1000">
+				<Repeat num_cycles="{num_obstacles}">
+                    <ForceSuccess>
+                        <visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose"/>
+                    </ForceSuccess>
+				</Repeat>
+            </Repeat>
+		</Sequence>
+  </BehaviorTree>
+</root>
