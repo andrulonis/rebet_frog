@@ -4,13 +4,11 @@
 		<Parallel>
 			<SubTree ID="DriveAroundRoom"/>
 			<RetryUntilSuccessful num_attempts="-1">
-				<Fallback>
+				<Sequence>
+					<TakePictures service_name="/take_pictures_srv" out_pics="{@good_pics}"/>
+					<Sleep msec = "1000"/>
 					<QuotaIsMet in_pics="{@good_pics}"/>
-					<Sequence>
-						<TakePictures service_name="/take_pictures_srv" out_pics="{@good_pics}"/>
-						<Sleep msec = "1000"/>
-					</Sequence>
-				</Fallback>
+				</Sequence>
 			</RetryUntilSuccessful>
 		</Parallel>
     </BehaviorTree>

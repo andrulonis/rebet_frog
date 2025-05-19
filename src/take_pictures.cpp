@@ -69,11 +69,29 @@ public:
         int num_good_pics = 0;
 };
 
-NodeStatus QuotaIsMet(TreeNode& self)
+class QuotaIsMet : public ConditionNode
 {
-    std::cout << self.getInput<int>("out_pics").value() << std::endl;
-    return (self.getInput<int>("out_pics").value() >= 5) ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
-}
+public:
+    static constexpr const char* GOOD_PICS = "in_pics";
+    static const int quota = 5;
+
+    QuotaIsMet(const std::string & instance_name,
+                const BT::NodeConfig& conf) :
+        ConditionNode(instance_name, conf)
+    {}
+
+    static PortsList providedPorts()
+    {
+        return  {InputPort<int>(GOOD_PICS)};
+    }
+
+    NodeStatus tick() override
+    {
+        int num_good_pics;
+        getInput<int>(GOOD_PICS, num_good_pics);
+        return num_good_pics >= quota ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+    }
+};
 
 BT_REGISTER_ROS_NODES(factory, params)
 {
@@ -82,7 +100,7 @@ BT_REGISTER_ROS_NODES(factory, params)
     aug_params.server_timeout = std::chrono::milliseconds(40000);
 
     factory.registerNodeType<TakePicturesService>("TakePictures", aug_params);
-    factory.registerSimpleCondition("QuotaIsMet", QuotaIsMet(), {InputPort<int>("out_pics")});
+    factory.registerNodeType<QuotaIsMet>("QuotaIsMet");
 }
 
 }
