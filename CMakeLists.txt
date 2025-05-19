@@ -68,6 +68,10 @@ add_library(detect_plugin SHARED src/detect_service.cpp)
 target_compile_definitions(detect_plugin PRIVATE  BT_PLUGIN_EXPORT )
 ament_target_dependencies(detect_plugin ${THIS_PACKAGE_DEPS})
 
+add_library(pictures_plugin SHARED src/take_pictures.cpp)
+target_compile_definitions(pictures_plugin PRIVATE  BT_PLUGIN_EXPORT )
+ament_target_dependencies(pictures_plugin ${THIS_PACKAGE_DEPS})
+
 add_library(initial_pose_plugin SHARED src/initial_pose_pub.cpp)
 target_compile_definitions(initial_pose_plugin PRIVATE  BT_PLUGIN_EXPORT )
 ament_target_dependencies(initial_pose_plugin ${THIS_PACKAGE_DEPS})
@@ -99,6 +103,7 @@ install(PROGRAMS
   scripts/tree_action_client.py
   scripts/weights_set_client.py
   scripts/yolo_as_a_service.py
+  scripts/pictures_as_a_service.py
   scripts/noisy_camera.py
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -108,6 +113,7 @@ install(TARGETS
   get_map_plugin
   gotopose_plugin
   detect_plugin
+  pictures_plugin
   initial_pose_plugin
   visit_obstacle_plugin
   robot_pose_plugin
@@ -119,6 +125,7 @@ install(TARGETS
   get_map_plugin
   gotopose_plugin
   detect_plugin
+  pictures_plugin
   initial_pose_plugin
   visit_obstacle_plugin
   robot_pose_plugin

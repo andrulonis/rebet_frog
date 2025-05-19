@@ -25,12 +25,12 @@ cd ~/rebet_ws
 vcs import --input src/rebet_frog/frog.rosinstall src
 ```
 
-3. Source your ROS2 Humble installation, install dependencies using rosdep
+4. Source your ROS2 Humble installation, install dependencies using rosdep
 ```bash
 source /opt/ros/humble/setup.bash
 rosdep install --from-paths src --ignore-src -r -y
 ```
-4. To be sure, you should manually install ultralytics
+5. To be sure, you should manually install ultralytics
 ```bash
 pip install ultralytics
 ```
@@ -39,12 +39,12 @@ as well as masced_bandits
 pip install masced_bandits
 ```
 
-5. Build everything
+6. Build everything
 ```bash
 colcon build --symlink-install
 ```
 
-6. Required for using [PRISM](https://www.prismmodelchecker.org) adaptation:
+7. Required for using [PRISM](https://www.prismmodelchecker.org) adaptation:
 ```bash
 cd ~/rebet_ws/src/aal/prism-4.8.1-linux64-x86
 ./install.sh
