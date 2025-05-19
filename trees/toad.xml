@@ -2,10 +2,15 @@
 	<include ros_pkg="rebet_frog" path="trees/frog_task_based.xml"/>
   	<BehaviorTree ID="TOAD">
 	
+		<SubTree ID="DriveAroundRoom"/>
+    </BehaviorTree>
+
+    <BehaviorTree ID="DriveAroundRoom">
+	
 		<Sequence>
 			<Script code="task_weight:=1.0; obj_power_weight:=1.0; @obj_power_metric:=-10.0; move_pow_weight:=1.0; @move_pow_metric:=-10.0; move_eff_weight:=1.0; @move_eff_metric:=-10.0; safe_weight:=1.0; @safe_metric:=-10.0"/>
 		
-			<!-- <SubTree ID="SLAMandCharge"/> -->
+			
 			<Sleep msec="3000"/> 
 			<RetryUntilSuccessful num_attempts="-1">
 				<getRobotPose topic_name="/odom" out_pose="{current_pose}" />
@@ -28,5 +33,5 @@
 				</Repeat>
             </Repeat>
 		</Sequence>
-  </BehaviorTree>
+    </BehaviorTree>
 </root>
