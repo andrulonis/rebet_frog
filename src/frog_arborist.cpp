@@ -2,6 +2,7 @@
 #include "rebet_frog/dock_location.h"
 
 #include "rebet_frog/frog_qrs.h"
+#include "rebet_frog/toad_qrs.h"
 #include "rebet_frog/frog_adapt_nodes.h"
 #include "rebet/arborist.hpp"
 #include "rebet/json_serialization.hpp"
@@ -31,6 +32,9 @@ public:
   {    
     //I suppose here you register all the possible custom nodes, and the determination as to whether they are actually used lies in the xml tree provided.      
     
+    // This is the toad one
+    factory.registerNodeType<PicturesPowerQR>("PicturesPowerQR");
+
     factory.registerNodeType<FilterObstacles>("filterObstacles");
     // factory.registerNodeType<SleepNode>("Sleep");
 
