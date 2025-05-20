@@ -16,8 +16,7 @@ class TakePicturesService : public RosServiceNode<TakePictures>
 {
 public:
     static constexpr const char* GOOD_PICS = "good_pics";
-
-
+    static constexpr const char* TOTAL_PICS = "total_pics";
 
     TakePicturesService(const std::string & instance_name,
                           const BT::NodeConfig& conf,
@@ -25,6 +24,7 @@ public:
         RosServiceNode<TakePictures>(instance_name, conf, params)
     {
         num_good_pics = 0;
+        num_total_pics = 0;
     }
 
     static PortsList providedPorts()
@@ -32,7 +32,8 @@ public:
         PortsList base_ports = RosServiceNode::providedPorts();
 
         PortsList child_ports = { 
-            OutputPort<int>(GOOD_PICS)
+            OutputPort<int>(GOOD_PICS),
+            OutputPort<int>(TOTAL_PICS)
         };
 
         child_ports.merge(base_ports);
@@ -43,7 +44,12 @@ public:
     bool setRequest(typename Request::SharedPtr& request) override
     {
         RCLCPP_INFO(logger(), "request");
-        request->rate = 2;
+
+        // TODO: Make rate depend on adaptation
+        int rate = 2;
+
+        request->rate = rate;
+        num_total_pics += rate;
     
         return true;
     }
@@ -61,12 +67,14 @@ public:
         int result = response.get()->result;
         num_good_pics += result;
         setOutput(GOOD_PICS, num_good_pics);
+        setOutput(TOTAL_PICS, num_total_pics);
 
         return NodeStatus::SUCCESS;
     }
 
     private:
-        int num_good_pics = 0;
+        int num_good_pics;
+        int num_total_pics;
 };
 
 class QuotaIsMet : public ConditionNode
