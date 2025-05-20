@@ -15,7 +15,7 @@ using TakePictures = rebet_msgs::srv::TakePictures;
 class TakePicturesService : public RosServiceNode<TakePictures>
 {
 public:
-    static constexpr const char* GOOD_PICS = "out_pics";
+    static constexpr const char* GOOD_PICS = "good_pics";
 
 
 
@@ -72,7 +72,7 @@ public:
 class QuotaIsMet : public ConditionNode
 {
 public:
-    static constexpr const char* GOOD_PICS = "in_pics";
+    static constexpr const char* GOOD_PICS = "good_pics";
     static const int quota = 5;
 
     QuotaIsMet(const std::string & instance_name,

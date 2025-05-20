@@ -5,9 +5,9 @@
 			<SubTree ID="DriveAroundRoom"/>
 			<RetryUntilSuccessful num_attempts="-1">
 				<Sequence>
-					<TakePictures service_name="/take_pictures_srv" out_pics="{@good_pics}"/>
+					<TakePictures service_name="/take_pictures_srv" good_pics="{@good_pics}"/>
 					<Sleep msec = "1000"/>
-					<QuotaIsMet in_pics="{@good_pics}"/>
+					<QuotaIsMet good_pics="{@good_pics}"/>
 				</Sequence>
 			</RetryUntilSuccessful>
 		</Parallel>
