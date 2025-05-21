@@ -26,12 +26,18 @@ class YoloAsAService(Node):
         
         self.bridge = CvBridge()
 
+        # TODO make parameter and prepare for using either model
+        self.current_model_name = "yolov8x"
+
         package_name = "rebet_frog"
-        weight_dir = get_package_share_directory(package_name) + "/config/" + "yolov8n.pt" 
+        weight_dir_x = get_package_share_directory(package_name) + "/config/" + "yolov8x.pt" 
+        weight_dir_n = get_package_share_directory(package_name) + "/config/" + "yolov8n.pt" 
 
-        self.model = YOLO(weight_dir)
+        self.models = {}
+        self.models["yolov8x"] = YOLO(weight_dir_x)
+        self.models["yolov8n"] = YOLO(weight_dir_n)
 
-        self.declare_parameter(IMG_TOPIC_PARAM, '/camera/image_noisy')
+        self.declare_parameter(IMG_TOPIC_PARAM, "/camera/image_noisy")
         self.topic_name = self.get_parameter(IMG_TOPIC_PARAM).get_parameter_value().string_value
 
         self.declare_parameter(PREDICTIONS_PARAM, 1)
@@ -69,51 +75,48 @@ class YoloAsAService(Node):
     
     def on_deactivate(self, state: State):
         self.get_logger().info('on_deactivate() is called.')
-        
+
         return TransitionCallbackReturn.SUCCESS if self.destroy_service(self.srv) else TransitionCallbackReturn.ERROR
     
     def listener_callback(self, msg):
-        
         self.image_received = msg
 
     def detect_obj_service(self, request, response):
         self.get_logger().info('Incoming request')
 
-        num_preds = self.get_parameter(PREDICTIONS_PARAM).get_parameter_value().integer_value
+        # current_model = self.get_parameter(CURRENT_MODEL).get_parameter_value().integer_value
 
-        for i in range(num_preds):
-            time.sleep(1)
-            rgb_msg = self.image_received #assume to be new..
+        time.sleep(1)
+        rgb_msg = self.image_received #assume to be new..
 
-            obj_id = ObjectsIdentified()
-            obj_id.object_detected = False
-            if rgb_msg is not None:
-                im = self.bridge.imgmsg_to_cv2(rgb_msg, desired_encoding="bgr8")
-                
-                results = self.model.predict(source=im, save=False, save_txt=False, show=False)  # save predictions as labels
-                # cv2.waitKey(3000)
-                # cv2.destroyAllWindows()
-                obj_id.object_names = []
-                obj_id.probabilities = []
-                for i in range(len(results)):
-                    try:
-                        obj_id.object_names.append(str(results[i].names[int(results[i].boxes.cls.cpu().numpy()[i])]))
-                        obj_id.probabilities.append(float(results[i].boxes.conf.cpu().numpy()[i]))
-                    except IndexError:
-                        continue
+        obj_id = ObjectsIdentified()
+        obj_id.object_detected = False
+        if rgb_msg is not None:
+            im = self.bridge.imgmsg_to_cv2(rgb_msg, desired_encoding="bgr8")
+            
+            results = self.models[self.current_model_name].predict(source=im, save=False, save_txt=False, verbose=True)  # save predictions as labels
+            # cv2.waitKey(3000)
+            # cv2.destroyAllWindows()
+            obj_id.object_names = []
+            obj_id.probabilities = []
+            for i in range(len(results)):
+                try:
+                    obj_id.object_names.append(str(results[i].names[int(results[i].boxes.cls.cpu().numpy()[i])]))
+                    obj_id.probabilities.append(float(results[i].boxes.conf.cpu().numpy()[i]))
+                    self.get_logger().info(f'{str(results[i].names[int(results[i].boxes.cls.cpu().numpy()[i])])}  --  {float(results[i].boxes.conf.cpu().numpy()[i])}')
+                except IndexError:
+                    continue
 
-                if(len(obj_id.object_names) > 0):
-                    obj_id.object_detected = True
+            if(len(obj_id.object_names) > 0):
+                obj_id.object_detected = True
 
-            obj_id.stamp = self.get_clock().now().to_msg()
-            response.objects_id.append(obj_id)
+        obj_id.stamp = self.get_clock().now().to_msg()
+        obj_id.model_used = self.current_model_name
+        response.objects_id = obj_id
         self.get_logger().info('sending response')
         
         response.id = request.id
         return response
-            
-    
-
 
 def main():
     rclpy.init()
@@ -122,7 +125,6 @@ def main():
     mt_executor = MultiThreadedExecutor()
     mt_executor.add_node(minimal_service)
     mt_executor.spin()
-
 
     rclpy.shutdown()
 

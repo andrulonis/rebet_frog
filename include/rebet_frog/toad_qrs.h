@@ -34,17 +34,17 @@
 
 using namespace BT;
 using namespace rebet;
+using ObjectsIdentified = rebet_msgs::msg::ObjectsIdentified;
 
-class PicturesPowerQR : public TaskLevelQR
+class DetectPowerQR : public TaskLevelQR
 {
   public:
-    PicturesPowerQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
-    {
-      _obj_last_timestamp = builtin_interfaces::msg::Time();
-      time_passed = 0;
-      pictures_taken = 0;
+    static constexpr const char* OBJS_DETECTED = "objs_detected";
 
-      setOutput(METRIC, pictures_taken * time_passed);
+
+    DetectPowerQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
+    {
+      setOutput(METRIC, 0);
     }
 
     static PortsList providedPorts()
@@ -52,7 +52,7 @@ class PicturesPowerQR : public TaskLevelQR
       PortsList base_ports = TaskLevelQR::providedPorts();
 
       PortsList child_ports =  {
-              InputPort<int>(TOTAL_PICS),
+              InputPort<std::vector<ObjectsIdentified>>(OBJS_DETECTED)
               };
       child_ports.merge(base_ports);
 
@@ -61,19 +61,59 @@ class PicturesPowerQR : public TaskLevelQR
 
     virtual void calculate_measure() override
     {
-      // std::cout << " calc measure object det power qr" << std::endl;
-        int total_pics;
-        getInput(TOTAL_PICS, total_pics);
-        
-        // TODO
-        int power_consumed = 3*total_pics;
-        setOutput(METRIC, power_consumed);
+      std::vector<ObjectsIdentified> results;
+      getInput(OBJS_DETECTED, results);
+      float power = 0;
+      for (int i = 0; i < results.size(); i++){
+        if (results[i].model_used == "yolov8x"){
+          power += 2;
+        }
+        else if (results[i].model_used == "yolov8n"){
+          power += 1;
+        }
+      }
+      setOutput(METRIC, power);
     }
   private:
-      int pictures_taken;
-      double time_passed;
-      
-      builtin_interfaces::msg::Time _obj_last_timestamp;
+};
 
-      static constexpr const char* TOTAL_PICS = "total_pics";
+class DetectAccuracyQR : public TaskLevelQR
+{
+  public:
+    static constexpr const char* OBJS_DETECTED = "objs_detected";
+
+
+    DetectAccuracyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
+    {
+      setOutput(METRIC, 0);
+    }
+
+    static PortsList providedPorts()
+    {
+      PortsList base_ports = TaskLevelQR::providedPorts();
+
+      PortsList child_ports =  {
+              InputPort<std::vector<ObjectsIdentified>>(OBJS_DETECTED)
+              };
+      child_ports.merge(base_ports);
+
+      return child_ports;
+    }
+
+    virtual void calculate_measure() override
+    {
+      std::vector<ObjectsIdentified> results;
+      getInput(OBJS_DETECTED, results);
+      float power = 0;
+      for (int i = 0; i < results.size(); i++){
+        if (results[i].model_used == "yolov8x"){
+          power += 4;
+        }
+        else if (results[i].model_used == "yolov8n"){
+          power += 3;
+        }
+      }
+      setOutput(METRIC, power);
+    }
+  private:
 };
