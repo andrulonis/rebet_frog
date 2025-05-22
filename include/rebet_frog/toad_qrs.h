@@ -14,6 +14,7 @@
 #include "rebet/qr_node.h"
 
 #include "rebet_frog/frog_constants.hpp"
+#include "rebet_frog/toad_constants.hpp"
 
 
 /**
@@ -44,6 +45,8 @@ class DetectPowerQR : public TaskLevelQR
 
     DetectPowerQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
     {
+      power_budget = STARTING_BUDGET;
+      num_objects_idd = 0;
       setOutput(METRIC, 0);
     }
 
@@ -63,18 +66,20 @@ class DetectPowerQR : public TaskLevelQR
     {
       std::vector<ObjectsIdentified> results;
       getInput(OBJS_DETECTED, results);
-      float power = 0;
-      for (int i = 0; i < results.size(); i++){
+      for (int i = num_objects_idd; i < results.size(); i++){
+        num_objects_idd++;
         if (results[i].model_used == "yolov8x"){
-          power += 2;
+          power_budget -= V8X_POWER_COST;
         }
         else if (results[i].model_used == "yolov8n"){
-          power += 1;
+          power_budget -= V8N_POWER_COST;
         }
       }
-      setOutput(METRIC, power);
+      setOutput(METRIC, power_budget);
     }
   private:
+    double power_budget;
+    int num_objects_idd;
 };
 
 class DetectAccuracyQR : public TaskLevelQR

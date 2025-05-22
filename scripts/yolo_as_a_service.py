@@ -14,6 +14,8 @@ from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rebet_msgs.msg import ObjectsIdentified
 import time
 
+DETECT_MODEL_PARAM = "detect_model_name"
+
 IMG_TOPIC_PARAM = "image_topic_name"
 PREDICTIONS_PARAM = "num_predictions"
 
@@ -23,11 +25,12 @@ class YoloAsAService(Node):
     def __init__(self):
         super().__init__('detect_object')
 
-        
+
         self.bridge = CvBridge()
 
         # TODO make parameter and prepare for using either model
-        self.current_model_name = "yolov8x"
+        self.declare_parameter(DETECT_MODEL_PARAM, "yolov8n")
+        self.current_model_name = self.get_parameter(DETECT_MODEL_PARAM).get_parameter_value().string_value
 
         package_name = "rebet_frog"
         weight_dir_x = get_package_share_directory(package_name) + "/config/" + "yolov8x.pt" 
@@ -60,7 +63,9 @@ class YoloAsAService(Node):
                 self.destroy_subscription(self.subscription)
                 self.create_image_subscriber() #replace prev subscriber
                 self.get_logger().info('Replaced current subscriber with subscriber to topic: "%s"' % param.value)
-
+            if(param.name == DETECT_MODEL_PARAM and param.value != self.current_model_name):
+                self.current_model_name = param.value
+                self.get_logger().info('Replaced current model used with new model: "%s"' % param.value)
 
         return SetParametersResult(successful=True)
 

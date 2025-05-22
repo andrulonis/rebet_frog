@@ -24,7 +24,9 @@
 					</ForceSuccess>
 					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
 					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
+					<AdjustDetectModel adaptation_strategy="random_strategy" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object">
 						<DetectObject service_name="/detect_object_srv" objs_detected="{@objs_detected}"/>
+					</AdjustDetectModel>
 					</DetectPowerQR>
 					</DetectAccuracyQR>
 				</Sequence>
