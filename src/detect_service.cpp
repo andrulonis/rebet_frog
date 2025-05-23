@@ -24,6 +24,7 @@ public:
         RosServiceNode<DetectObject>(instance_name, conf, params)
     {
         all_object_ids = {};
+        setOutput(OBJS_DETECTED, all_object_ids);
     }
 
     static PortsList providedPorts()

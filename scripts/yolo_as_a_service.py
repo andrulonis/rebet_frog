@@ -28,7 +28,6 @@ class YoloAsAService(Node):
 
         self.bridge = CvBridge()
 
-        # TODO make parameter and prepare for using either model
         self.declare_parameter(DETECT_MODEL_PARAM, "yolov8n")
         self.current_model_name = self.get_parameter(DETECT_MODEL_PARAM).get_parameter_value().string_value
 

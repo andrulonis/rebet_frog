@@ -11,11 +11,14 @@
 #include "lifecycle_msgs/msg/transition.hpp"
 #include "rebet/adapt_node.h"
 #include "rebet/rebet_utilities.hpp"
+#include "rebet_msgs/msg/objects_identified.hpp"
 
 #include "rebet_frog/frog_constants.hpp"
 
 #include "rebet_msgs/msg/qr.hpp"
 #include "diagnostic_msgs/msg/key_value.hpp"
+
+using ObjectsIdentified = rebet_msgs::msg::ObjectsIdentified;
 
 namespace BT
 {
@@ -50,26 +53,62 @@ class AdjustDetectModel: public AdaptOnConditionOnStart<std::string>
 
         _var_params.push_back(variable_param);
       }
-  
+
       static PortsList providedPorts()
       {
         PortsList base_ports = AdaptOnConditionOnStart::providedPorts();
   
         PortsList child_ports =  {
-                };
+          InputPort<std::vector<ObjectsIdentified>>(OBJS_DETECTED),
+          InputPort<double>(DETECT_POWER_METRIC)
+        };
         child_ports.merge(base_ports);
   
         return child_ports;
       }
-  
-      virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros_parameter) override
+    
+      virtual std::vector<KV_MSG> collect_config() override
       {
-        std::cout << "util_of_adap_max_speed" << std::endl;
-        auto parameter_object = rclcpp::ParameterValue(ros_parameter.value);
+        std::vector<KV_MSG> current_config;
+        double power_budget;
+        std::vector<ObjectsIdentified> objects;
   
-        return 0.0;
+        auto power_res = getInput(DETECT_POWER_METRIC, power_budget);
+        auto objects_res = getInput(OBJS_DETECTED, objects);
+     
+        if (power_res) {
+          auto kv_power_left = KV_MSG();
+          kv_power_left.key = "power_left";
+          // Fuzzify data
+          int power_rounded = static_cast<int>(power_budget); // Always round down
+          kv_power_left.value = std::to_string(power_rounded);
+          current_config.push_back(kv_power_left);
+        }
+     
+        if (objects_res) {
+          auto kv_obs_idd = KV_MSG();
+          kv_obs_idd.key = "obs_idd";
+          int num_obs_idd = objects.size();
+          kv_obs_idd.value = std::to_string(num_obs_idd);
+          current_config.push_back(kv_obs_idd);
+        } else { // If this is the first time, objs_detected has not been written to blackboard yet.
+          auto kv_obs_idd = KV_MSG();
+          kv_obs_idd.key = "obs_idd";
+          int num_obs_idd = 0;
+          kv_obs_idd.value = std::to_string(num_obs_idd);
+          current_config.push_back(kv_obs_idd);
+        }
+  
+        auto kv_are_all_objects_visited = KV_MSG();
+        kv_are_all_objects_visited.key = "are_all_objects_visited";
+        kv_are_all_objects_visited.value = std::to_string(0); // always no, otherwise we wouldn't adapt
+        current_config.push_back(kv_are_all_objects_visited);
+  
+        return current_config;
       }
   
     private:
+      static constexpr const char* OBJS_DETECTED = "objs_detected";
+      static constexpr const char* DETECT_POWER_METRIC = "detect_power_metric";
 };
 }

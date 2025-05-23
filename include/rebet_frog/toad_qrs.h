@@ -40,14 +40,11 @@ using ObjectsIdentified = rebet_msgs::msg::ObjectsIdentified;
 class DetectPowerQR : public TaskLevelQR
 {
   public:
-    static constexpr const char* OBJS_DETECTED = "objs_detected";
-
-
     DetectPowerQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
     {
       power_budget = STARTING_BUDGET;
       num_objects_idd = 0;
-      setOutput(METRIC, 0);
+      setOutput(METRIC, power_budget);
     }
 
     static PortsList providedPorts()
@@ -78,6 +75,8 @@ class DetectPowerQR : public TaskLevelQR
       setOutput(METRIC, power_budget);
     }
   private:
+    static constexpr const char* OBJS_DETECTED = "objs_detected";
+
     double power_budget;
     int num_objects_idd;
 };
@@ -85,9 +84,6 @@ class DetectPowerQR : public TaskLevelQR
 class DetectAccuracyQR : public TaskLevelQR
 {
   public:
-    static constexpr const char* OBJS_DETECTED = "objs_detected";
-
-
     DetectAccuracyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
     {
       setOutput(METRIC, 0);
@@ -120,5 +116,7 @@ class DetectAccuracyQR : public TaskLevelQR
       }
       setOutput(METRIC, power);
     }
+
   private:
+    static constexpr const char* OBJS_DETECTED = "objs_detected";
 };
