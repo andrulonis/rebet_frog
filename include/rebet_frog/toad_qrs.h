@@ -63,7 +63,7 @@ class DetectPowerQR : public TaskLevelQR
     {
       std::vector<ObjectsIdentified> results;
       getInput(OBJS_DETECTED, results);
-      for (int i = num_objects_idd; i < results.size(); i++){
+      for (long unsigned i = num_objects_idd; i < results.size(); i++){
         num_objects_idd++;
         if (results[i].model_used == "yolov8x"){
           power_budget -= V8X_POWER_COST;
@@ -106,7 +106,7 @@ class DetectAccuracyQR : public TaskLevelQR
       std::vector<ObjectsIdentified> results;
       getInput(OBJS_DETECTED, results);
       float power = 0;
-      for (int i = 0; i < results.size(); i++){
+      for (long unsigned int i = 0; i < results.size(); i++){
         if (results[i].model_used == "yolov8x"){
           power += 4;
         }

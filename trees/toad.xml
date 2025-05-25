@@ -24,7 +24,7 @@
 					</ForceSuccess>
 					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
 					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
-					<AdjustDetectModel adaptation_strategy="mdp_strategy" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
+					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
 						<DetectObject service_name="/detect_object_srv" objs_detected="{@objs_detected}"/>
 					</AdjustDetectModel>
 					</DetectPowerQR>
