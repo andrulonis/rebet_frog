@@ -17,7 +17,7 @@ module main
     [config0] are_all_objects_visited = 0 & power_left >= yolov8n_power -> 
         (1-p_last_object) : (are_all_objects_visited' = 0) & (power_left'=power_left-yolov8n_power) & (obs_idd'=obs_idd+1) +
         (p_last_object) : (are_all_objects_visited' = 1) & (power_left'=power_left-yolov8n_power) & (obs_idd'=obs_idd+1);
-    [config0] are_all_objects_visited = 0 & power_left < yolov8n_power -> (obs_idd'=obs_idd); // to avoid deadlocks, add this option without the power for it
+    [config0] are_all_objects_visited = 0 & power_left < yolov8n_power -> (are_all_objects_visited' = 1); // to avoid deadlocks, add this option without the power for it
     [config1] are_all_objects_visited = 0 & power_left >= yolov8x_power -> 
         (1-p_last_object) : (are_all_objects_visited' = 0) & (power_left'=power_left-yolov8x_power) & (obs_idd'=obs_idd+1) +
         (p_last_object) : (are_all_objects_visited' = 1) & (power_left'=power_left-yolov8x_power) & (obs_idd'=obs_idd+1);
