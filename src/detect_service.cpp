@@ -7,6 +7,7 @@
 #include <math.h>
 #include "nav_msgs/msg/odometry.hpp"
 #include "behaviortree_ros2/plugins.hpp"
+#include "rebet_frog/toad_constants.hpp"
 
 namespace BT {
 
@@ -16,8 +17,6 @@ using ObjectsIdentified = rebet_msgs::msg::ObjectsIdentified;
 class DetectObjectService : public RosServiceNode<DetectObject>
 {
 public:
-    static constexpr const char* OBJS_DETECTED= "objs_detected";
-
     DetectObjectService(const std::string & instance_name,
                           const BT::NodeConfig& conf,
                           const BT::RosNodeParams& params) :
@@ -32,7 +31,8 @@ public:
         PortsList base_ports = RosServiceNode::providedPorts();
 
         PortsList child_ports = { 
-                OutputPort<std::vector<ObjectsIdentified>>(OBJS_DETECTED)
+                OutputPort<std::vector<ObjectsIdentified>>(OBJS_DETECTED),
+                InputPort<double>(DETECT_POWER_METRIC)
                 };
 
         child_ports.merge(base_ports);
@@ -62,7 +62,17 @@ public:
 
         ObjectsIdentified obj_idd = response.get()->objects_id;
 
-        all_object_ids.push_back(obj_idd);
+        // If there was no power budget for yolo, pretend like it was never run
+        double power_left;
+        getInput(DETECT_POWER_METRIC, power_left);
+        double power_used;
+        if (obj_idd.model_used == "yolov8n")
+            power_used = V8N_POWER_COST;
+        else if (obj_idd.model_used == "yolov8x")
+            power_used = V8X_POWER_COST;
+
+        if (power_left >= power_used)
+            all_object_ids.push_back(obj_idd);
 
         setOutput(OBJS_DETECTED, all_object_ids);
 
@@ -72,6 +82,9 @@ public:
     }
 
     private:
+        static constexpr const char* OBJS_DETECTED= "objs_detected";
+        static constexpr const char* DETECT_POWER_METRIC = "detect_power_metric";
+
         std::vector<ObjectsIdentified> all_object_ids;
 };
 

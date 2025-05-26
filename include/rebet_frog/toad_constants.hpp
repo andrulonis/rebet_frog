@@ -3,7 +3,6 @@
 
 #include <math.h>
 
-// TODO: Ask what these should be
 inline constexpr double STARTING_BUDGET = 30.0; // Arbitrary
 inline constexpr double V8X_POWER_COST = 14.25; // Set to LatencyT4TensorRT10FP16 of model
 inline constexpr double V8N_POWER_COST = 1.5;   // Set to LatencyT4TensorRT10FP16 of model
