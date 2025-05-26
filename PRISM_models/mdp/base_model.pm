@@ -10,9 +10,9 @@ const max_num_obs = 10;
 formula p_last_object = 1/(max_num_obs-obs_idd);
 
 module main
-    power_left: [0..max_power_budget] init max_power_budget;
-    obs_idd: [0..max_num_obs] init 0;
-    are_all_objects_visited: [0..1] init 0; // treated as boolean
+    power_left: [0..max_power_budget] init power_left_init;
+    obs_idd: [0..max_num_obs] init obs_idd_init;
+    are_all_objects_visited: [0..1] init are_all_objects_visited_init; // treated as boolean
 
     [config0] are_all_objects_visited = 0 & power_left >= yolov8n_power -> 
         (1-p_last_object) : (are_all_objects_visited' = 0) & (power_left'=power_left-yolov8n_power) & (obs_idd'=obs_idd+1) +
