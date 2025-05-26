@@ -79,6 +79,40 @@ class DetectPowerQR : public TaskLevelQR
 
     double power_budget;
     int num_objects_idd;
+
+    // override to calculate measure before ticking child
+    virtual NodeStatus tick() override
+    {
+      setStatus(NodeStatus::RUNNING);
+      calculate_measure();
+      const NodeStatus child_status = child_node_->executeTick();
+
+      switch (child_status)
+      {
+        case NodeStatus::SUCCESS: {
+          resetChild();
+          return NodeStatus::SUCCESS;
+        }
+
+        case NodeStatus::FAILURE: {
+          resetChild();
+          return NodeStatus::FAILURE;
+        }
+
+        case NodeStatus::RUNNING: {
+          return NodeStatus::RUNNING;
+        }
+
+        case NodeStatus::SKIPPED: {
+          return NodeStatus::SKIPPED;
+        }
+        case NodeStatus::IDLE: {
+          throw LogicError("[", name(), "]: A child should not return IDLE");
+        }
+      }
+      return status();
+
+    }
 };
 
 class DetectAccuracyQR : public TaskLevelQR
