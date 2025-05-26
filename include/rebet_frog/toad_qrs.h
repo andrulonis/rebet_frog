@@ -64,7 +64,6 @@ class DetectPowerQR : public TaskLevelQR
       std::vector<ObjectsIdentified> results;
       getInput(OBJS_DETECTED, results);
       for (long unsigned i = num_objects_idd; i < results.size(); i++){
-        num_objects_idd++;
         if (results[i].model_used == "yolov8x"){
           power_budget -= V8X_POWER_COST;
         }
@@ -72,6 +71,7 @@ class DetectPowerQR : public TaskLevelQR
           power_budget -= V8N_POWER_COST;
         }
       }
+      num_objects_idd = results.size();
       setOutput(METRIC, power_budget);
     }
   private:
@@ -120,7 +120,9 @@ class DetectAccuracyQR : public TaskLevelQR
   public:
     DetectAccuracyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Power)
     {
-      setOutput(METRIC, 0);
+      accuracy_sum = 0;
+      num_objects_idd = 0;
+      setOutput(METRIC, accuracy_sum);
     }
 
     static PortsList providedPorts()
@@ -139,18 +141,21 @@ class DetectAccuracyQR : public TaskLevelQR
     {
       std::vector<ObjectsIdentified> results;
       getInput(OBJS_DETECTED, results);
-      float power = 0;
-      for (long unsigned int i = 0; i < results.size(); i++){
+      for (long unsigned int i = num_objects_idd; i < results.size(); i++){
         if (results[i].model_used == "yolov8x"){
-          power += 4;
+          accuracy_sum += V8X_ACCURACY;
         }
         else if (results[i].model_used == "yolov8n"){
-          power += 3;
+          accuracy_sum += V8N_ACCURACY;
         }
       }
-      setOutput(METRIC, power);
+      num_objects_idd = results.size();
+      setOutput(METRIC, accuracy_sum);
     }
 
   private:
     static constexpr const char* OBJS_DETECTED = "objs_detected";
+
+    double accuracy_sum;
+    int num_objects_idd;
 };
