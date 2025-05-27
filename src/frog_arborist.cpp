@@ -37,6 +37,8 @@ public:
     factory.registerNodeType<DetectPowerQR>("DetectPowerQR");
     factory.registerNodeType<DetectAccuracyQR>("DetectAccuracyQR");
     factory.registerNodeType<AdjustDetectModel>("AdjustDetectModel");
+    factory.registerNodeType<AdjustMaxSpeed>("AdjustMaxSpeed");
+
 
     // TOAD
 

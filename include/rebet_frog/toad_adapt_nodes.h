@@ -111,4 +111,55 @@ class AdjustDetectModel: public AdaptOnConditionOnStart<std::string>
       static constexpr const char* OBJS_DETECTED = "objs_detected";
       static constexpr const char* DETECT_POWER_METRIC = "detect_power_metric";
 };
+
+class AdjustMaxSpeed : public AdaptOnConditionOnStart<double>
+{
+  public:
+    using QR_MSG = rebet_msgs::msg::QR;
+
+    AdjustMaxSpeed(const std::string& name, const NodeConfig& config) : AdaptOnConditionOnStart<double>(name, config, AdaptationTarget::RosParameter, AdaptationType::External)
+    {
+      _condition_default = true;
+
+      //Since we are only interested in modifying the x-axis (backwards/forwards) speed, we wrap the adaptation_options given into the required triple of x y theta speeds.
+      std::vector<double> param_values;
+      std::string param_name;
+      std::string node_name;
+      getInput(ADAP_OPT, param_values);
+      getInput(ADAP_SUB, param_name);
+      getInput(ADAP_LOC, node_name);
+      
+      power_qr_max_value = (double)calculate_power_motion(WAFFLE_MAX_LIN_VEL);
+      aal_msgs::msg::AdaptationOptions variable_param = aal_msgs::msg::AdaptationOptions();
+
+      variable_param.name = param_name;
+      variable_param.node_name = node_name;
+      variable_param.adaptation_target_type = static_cast<int8_t>(adaptation_target_);
+
+      for (double val : param_values) {
+          std::vector<double> speed_vector = {val,_default_y_velocity,_default_theta_velocity};
+          rclcpp::ParameterValue par_val = rclcpp::ParameterValue(speed_vector); //Here we wrap it with default values
+          variable_param.possible_values.push_back(par_val.to_value_msg());
+      }
+      _var_params.push_back(variable_param); //vector of VariableParameter   
+
+    //If you overwrite tick, and do this at different moments you can change the adaptation options at runtime.  
+    }
+
+    static PortsList providedPorts()
+    {
+      PortsList base_ports = AdaptOnConditionOnStart::providedPorts();
+
+      PortsList child_ports =  {
+        };
+      child_ports.merge(base_ports);
+
+      return child_ports;
+    }
+
+  private:
+    double _default_y_velocity = 0.0; //The robot in question can not move along its y axis independently.
+    double _default_theta_velocity = 2.5; //We are not interested in modifying the rotation speed here, but could be extended to do so.
+    double power_qr_max_value;
+};
 }
