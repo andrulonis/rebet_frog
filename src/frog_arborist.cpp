@@ -38,6 +38,7 @@ public:
     factory.registerNodeType<DetectAccuracyQR>("DetectAccuracyQR");
     factory.registerNodeType<AdjustDetectModel>("AdjustDetectModel");
     factory.registerNodeType<AdjustMaxSpeed>("AdjustMaxSpeed");
+    factory.registerNodeType<MovementEfficiencyQR>("MovementEfficiencyQR");
 
 
     // TOAD
@@ -52,7 +53,7 @@ public:
     factory.registerNodeType<ObjectDetectionPowerQR>("DetectObjectsSavePower");
 
 
-    factory.registerNodeType<MovementEfficiencyQR>("MovementEfficiencyQR");
+    // factory.registerNodeType<MovementEfficiencyQR>("MovementEfficiencyQR");
     factory.registerNodeType<MovementPowerQR>("MovementPowerQR");
 
 

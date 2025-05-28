@@ -19,11 +19,13 @@
 			<Sleep msec="1000"/>
 			<Repeat num_cycles="{num_obstacles}">
 				<Sequence>
-					<AdjustMaxSpeed adaptation_strategy="random_strategy" adaptation_options="0.10;0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother">
-						<ForceSuccess>
-							<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose"/>
-						</ForceSuccess>
-					</AdjustMaxSpeed>
+					<MovementEfficiencyQR metric="{@move_eff_metric}" in_odom="{@odometry}"> 
+						<AdjustMaxSpeed adaptation_strategy="random_strategy" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother">
+							<ForceSuccess>
+								<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
+							</ForceSuccess>
+						</AdjustMaxSpeed>
+					</MovementEfficiencyQR>
 					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
 					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
 					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">

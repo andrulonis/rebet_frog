@@ -159,3 +159,89 @@ class DetectAccuracyQR : public TaskLevelQR
     double accuracy_sum;
     int num_objects_idd;
 };
+
+class MovementEfficiencyQR : public TaskLevelQR
+{
+  public:
+    builtin_interfaces::msg::Time last_timestamp;
+    int window_start;
+
+    MovementEfficiencyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::MovementEfficiency)
+    {
+      _window_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+      _last_odom = _window_start;
+      _odom_last_timestamp = builtin_interfaces::msg::Time();
+    }
+
+    void initialize(int window_length)
+    {
+        _window_length = window_length;
+    }
+
+
+    static PortsList providedPorts()
+    {
+      PortsList base_ports = TaskLevelQR::providedPorts();
+
+      PortsList child_ports = { 
+              InputPort<rebet::SystemAttributeValue>(IN_ODOM,"odometry message wrapped in a systemattributevalue instance"),
+              };
+
+      child_ports.merge(base_ports);
+
+      return child_ports;
+    }
+	
+    virtual void calculate_measure() override
+    {
+      auto res = getInput(IN_ODOM,_odom_attribute); 
+      if(res)
+      {
+        _odom_msg = _odom_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_ODOM>();
+
+
+        if(_odom_msg.header.stamp != _odom_last_timestamp)
+        {
+          _linear_speed = hypot(fabs(_odom_msg.twist.twist.linear.x), fabs(_odom_msg.twist.twist.linear.y));
+          _odom_last_timestamp = _odom_msg.header.stamp;
+
+          if(_linear_speed > 0.03) //this is to circumvent a start from stationary being considered as part of this QR.
+          {
+            float speed_ratio = (_linear_speed/WAFFLE_MAX_LIN_VEL);
+            _metric = std::clamp(speed_ratio,0.0f,1.0f);
+
+            output_metric();
+            metric_mean();
+
+            setOutput(MEAN_METRIC,_average_metric);
+          }
+        }
+      }
+
+      // auto curr_time_pointer = std::chrono::system_clock::now();
+
+      // int current_time = std::chrono::duration_cast<std::chrono::seconds>(curr_time_pointer.time_since_epoch()).count();
+      // int elapsed_seconds = current_time-_window_start;
+
+      // if(elapsed_seconds >= _window_length)
+      // {
+      //   _window_start = current_time;
+      // }
+
+    }
+  private:
+      rebet::SystemAttributeValue _odom_attribute;
+      int _window_length;
+      int _window_start;
+      int _last_odom;
+      float _linear_speed;
+      builtin_interfaces::msg::Time _odom_last_timestamp;
+
+
+      nav_msgs::msg::Odometry _odom_msg;
+      int _odom_last_timestamp_sec;
+
+      const float WAFFLE_MAX_LIN_VEL = 0.26;
+
+      static constexpr const char* IN_ODOM = "in_odom";
+};

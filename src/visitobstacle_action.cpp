@@ -18,22 +18,9 @@ using PoseStamped = geometry_msgs::msg::PoseStamped;
 using Quaternion = geometry_msgs::msg::Quaternion;
 using Odometry = nav_msgs::msg::Odometry;
 
-
-
-
-
-
-
-
-
 class VisitObstacleAction: public RosActionNode<NavigateToPose>
 {
 public:  
-
-  //Name for the pose input port
-  static constexpr const char* POSES = "poses";
-  static constexpr const char* POSE_IN = "in_pose";
-
   VisitObstacleAction(const std::string& name,
                   const NodeConfig& conf,
                   const RosNodeParams& params)
@@ -57,7 +44,7 @@ public:
               InputPort<Odometry>(POSE_IN),
               OutputPort<float>("out_time_elapsed"),
               OutputPort<std::string>("name_of_task"),
-
+              OutputPort<double>(DISTANCE_TO_POSE)
             };
 
     child_ports.merge(base_ports);
@@ -224,7 +211,13 @@ public:
   // The Cancel request will be send automatically to the server.
   NodeStatus onFeedback(const std::shared_ptr<const Feedback> feedback)
   {
-    // RCLCPP_INFO(logger(), "Fdbk go to pose");
+    feedback_counter++;
+    // feedback has a high frequency, only update blackboard one in every 50 times
+    if (feedback_counter == 50){
+      double distance_remaining = feedback->distance_remaining;
+      setOutput(DISTANCE_TO_POSE, distance_remaining);
+      feedback_counter = 0;
+    }
 
     // #feedback definition
     // geometry_msgs/PoseStamped current_pose
@@ -249,9 +242,13 @@ public:
     return NodeStatus::RUNNING;
   }
 private:
+  static constexpr const char* POSES = "poses";
+  static constexpr const char* POSE_IN = "in_pose";
+  static constexpr const char* DISTANCE_TO_POSE = "distance_to_pose";
+
   int num_executions = 0;
   std::vector<Point> poses_to_go_to_;
-  
+  int feedback_counter = 0;
 };
 
 BT_REGISTER_ROS_NODES(factory, params)
