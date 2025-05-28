@@ -752,108 +752,108 @@ class SystemPowerQR : public SystemLevelQR
 //       static constexpr const char* IN_ODOM = "in_odom";
 // };
 
-class SafetyQR : public TaskLevelQR
-{
-  public:
-    int counter;
-    double detection_threshold; 
-    std::string goal_object;
-    double times_detected;
-    builtin_interfaces::msg::Time last_timestamp;
-    double max_detected;
-    int detected_in_window;
-    int window_start;
-    SafetyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Safety)
-    {
-      counter = 0;
+// class SafetyQR : public TaskLevelQR
+// {
+//   public:
+//     int counter;
+//     double detection_threshold; 
+//     std::string goal_object;
+//     double times_detected;
+//     builtin_interfaces::msg::Time last_timestamp;
+//     double max_detected;
+//     int detected_in_window;
+//     int window_start;
+//     SafetyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Safety)
+//     {
+//       counter = 0;
 
-      _window_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-      _obj_last_timestamp = builtin_interfaces::msg::Time();
-      _odom_last_timestamp_sec = 0;
+//       _window_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+//       _obj_last_timestamp = builtin_interfaces::msg::Time();
+//       _odom_last_timestamp_sec = 0;
             
-    }
+//     }
 
-    // void initialize(int window_length)
-    // {
+//     // void initialize(int window_length)
+//     // {
 
-    // }
+//     // }
 
 
-    static PortsList providedPorts()
-    {
-      PortsList base_ports = TaskLevelQR::providedPorts();
+//     static PortsList providedPorts()
+//     {
+//       PortsList base_ports = TaskLevelQR::providedPorts();
 
-      PortsList child_ports = { 
-              InputPort<rebet::SystemAttributeValue>(IN_LASER,"laser_scan message wrapped in a systemattributevalue instance"),
-              };
+//       PortsList child_ports = { 
+//               InputPort<rebet::SystemAttributeValue>(IN_LASER,"laser_scan message wrapped in a systemattributevalue instance"),
+//               };
 
-      child_ports.merge(base_ports);
+//       child_ports.merge(base_ports);
 
-      return child_ports;
-    }
+//       return child_ports;
+//     }
 	
-    virtual void calculate_measure() override
-    {
-      auto res = getInput(IN_LASER,_laser_attribute); 
+//     virtual void calculate_measure() override
+//     {
+//       auto res = getInput(IN_LASER,_laser_attribute); 
 
-      if(res)
-      {
-        _laser_msg = _laser_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_LASER>();
-        if(_laser_msg.header.stamp != _obj_last_timestamp)
-        {
-          _obj_last_timestamp = _laser_msg.header.stamp; 
+//       if(res)
+//       {
+//         _laser_msg = _laser_attribute.get<rebet::SystemAttributeType::ATTRIBUTE_LASER>();
+//         if(_laser_msg.header.stamp != _obj_last_timestamp)
+//         {
+//           _obj_last_timestamp = _laser_msg.header.stamp; 
 
-          //The _laser_msg is certified fresh
+//           //The _laser_msg is certified fresh
 
-          float laser_min = _laser_msg.range_min;
-          float laser_max = _laser_msg.range_max;
+//           float laser_min = _laser_msg.range_min;
+//           float laser_max = _laser_msg.range_max;
 
-          float nearest_object = laser_max*2; //anything above laser_max should work
+//           float nearest_object = laser_max*2; //anything above laser_max should work
 
-          for (float const & laser_dist : _laser_msg.ranges)
-          {
-            if(laser_dist < laser_max && laser_dist > laser_min)
-            {
-              nearest_object = (laser_dist < nearest_object) ? laser_dist : nearest_object;
-            }
-          }
+//           for (float const & laser_dist : _laser_msg.ranges)
+//           {
+//             if(laser_dist < laser_max && laser_dist > laser_min)
+//             {
+//               nearest_object = (laser_dist < nearest_object) ? laser_dist : nearest_object;
+//             }
+//           }
 
-          _fitted_nearest = (nearest_object - laser_min) / (laser_max - laser_min);
+//           _fitted_nearest = (nearest_object - laser_min) / (laser_max - laser_min);
 
-          std::cout << "fitted nearest " << _fitted_nearest << std::endl;
+//           std::cout << "fitted nearest " << _fitted_nearest << std::endl;
 
-          _metric = std::clamp(_fitted_nearest,0.0f,1.0f);
+//           _metric = std::clamp(_fitted_nearest,0.0f,1.0f);
 
-          std::cout << "metric in safety " << _metric << std::endl; 
+//           std::cout << "metric in safety " << _metric << std::endl; 
 
-          // auto curr_time_pointer = std::chrono::system_clock::now();
+//           // auto curr_time_pointer = std::chrono::system_clock::now();
 
-          // int current_time = std::chrono::duration_cast<std::chrono::seconds>(curr_time_pointer.time_since_epoch()).count();
+//           // int current_time = std::chrono::duration_cast<std::chrono::seconds>(curr_time_pointer.time_since_epoch()).count();
 
-          output_metric();
-          metric_mean();
+//           output_metric();
+//           metric_mean();
 
-          setOutput(MEAN_METRIC,_average_metric);
-        }
+//           setOutput(MEAN_METRIC,_average_metric);
+//         }
 
-      }
+//       }
 
 
       
      
 
 
-    }
-  private:
-      rebet::SystemAttributeValue _laser_attribute;
-      int _window_length;
-      int _window_start;
-      float _fitted_nearest;
+//     }
+//   private:
+//       rebet::SystemAttributeValue _laser_attribute;
+//       int _window_length;
+//       int _window_start;
+//       float _fitted_nearest;
 
-      sensor_msgs::msg::LaserScan _laser_msg;
-      int _odom_last_timestamp_sec;
-      builtin_interfaces::msg::Time _obj_last_timestamp;
+//       sensor_msgs::msg::LaserScan _laser_msg;
+//       int _odom_last_timestamp_sec;
+//       builtin_interfaces::msg::Time _obj_last_timestamp;
 
-      static constexpr const char* IN_LASER = "in_laser_scan";
+//       static constexpr const char* IN_LASER = "in_laser_scan";
 
-};
+// };

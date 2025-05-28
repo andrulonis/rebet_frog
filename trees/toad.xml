@@ -1,8 +1,6 @@
 <root BTCPP_format="4" main_tree_to_execute="TOAD">
   	<BehaviorTree ID="TOAD">
 		<Sequence>
-			<Script code="task_weight:=1.0; obj_power_weight:=1.0; @obj_power_metric:=-10.0; move_pow_weight:=1.0; @move_pow_metric:=-10.0; move_eff_weight:=1.0; @move_eff_metric:=-10.0; safe_weight:=1.0; @safe_metric:=-10.0"/>
-		
 			<Sleep msec="3000"/> 
 			<RetryUntilSuccessful num_attempts="-1">
 				<getRobotPose topic_name="/odom" out_pose="{current_pose}" />
@@ -19,19 +17,22 @@
 			<Sleep msec="1000"/>
 			<Repeat num_cycles="{num_obstacles}">
 				<Sequence>
-					<MovementEfficiencyQR metric="{@move_eff_metric}" in_odom="{@odometry}"> 
-						<AdjustMaxSpeed adaptation_strategy="random_strategy" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother">
+					<MovementEfficiencyQR metric="{@move_eff_metric}" odometry="{@odometry}"> 
+					<SafetyQR metric="{@safety_metric}" mean_metric="{@mean_safety_metric}" laser_scan="{@laser_scan}">
+						<AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}" distance_to_pose="{@distance_to_pose}" safety_metric="{@safety_metric}" mean_safety_metric="{@mean_safety_metric}">
+						<!-- <AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}"> -->
 							<ForceSuccess>
 								<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
 							</ForceSuccess>
 						</AdjustMaxSpeed>
+					</SafetyQR>
 					</MovementEfficiencyQR>
 					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
 					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
-					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
-					<!-- <AdjustDetectModel adaptation_strategy="markov_chain_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/markov_chain" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
+					<!-- <AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
+					<!-- <AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
 						<DetectObject service_name="/detect_object_srv" objs_detected="{@objs_detected}" detect_power_metric="{@detect_power_metric}"/>
-					</AdjustDetectModel>
+					<!-- </AdjustDetectModel> -->
 					</DetectPowerQR>
 					</DetectAccuracyQR>
 				</Sequence>

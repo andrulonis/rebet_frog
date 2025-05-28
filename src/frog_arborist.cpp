@@ -39,6 +39,7 @@ public:
     factory.registerNodeType<AdjustDetectModel>("AdjustDetectModel");
     factory.registerNodeType<AdjustMaxSpeed>("AdjustMaxSpeed");
     factory.registerNodeType<MovementEfficiencyQR>("MovementEfficiencyQR");
+    factory.registerNodeType<SafetyQR>("SafetyQR");
 
 
     // TOAD
@@ -49,7 +50,6 @@ public:
     factory.registerNodeType<ObjectDetectionEfficiencyQR>("DetectObjectsEfficiently");
     factory.registerNodeType<SimpleSystemPowerQR>("KeepBatteryMin");
     factory.registerNodeType<SystemPowerQR>("PowerQR");
-    factory.registerNodeType<SafetyQR>("SafetyQR");
     factory.registerNodeType<ObjectDetectionPowerQR>("DetectObjectsSavePower");
 
 
