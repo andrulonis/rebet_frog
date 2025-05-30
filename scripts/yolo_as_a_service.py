@@ -16,10 +16,6 @@ import time
 
 DETECT_MODEL_PARAM = "detect_model_name"
 
-IMG_TOPIC_PARAM = "image_topic_name"
-PREDICTIONS_PARAM = "num_predictions"
-
-
 class YoloAsAService(Node):
 
     def __init__(self):
@@ -39,10 +35,7 @@ class YoloAsAService(Node):
         self.models["yolov8x"] = YOLO(weight_dir_x)
         self.models["yolov8n"] = YOLO(weight_dir_n)
 
-        self.declare_parameter(IMG_TOPIC_PARAM, "/camera/image_noisy")
-        self.topic_name = self.get_parameter(IMG_TOPIC_PARAM).get_parameter_value().string_value
-
-        self.declare_parameter(PREDICTIONS_PARAM, 1)
+        self.topic_name = "/camera/image_noisy"
 
         self.image_received = None
         self.get_logger().info('created')
@@ -57,11 +50,6 @@ class YoloAsAService(Node):
 
     def parameter_changed_callback(self, params):
         for param in params:
-            if(param.name == IMG_TOPIC_PARAM and param.value != self.topic_name):
-                self.topic_name = param.value
-                self.destroy_subscription(self.subscription)
-                self.create_image_subscriber() #replace prev subscriber
-                self.get_logger().info('Replaced current subscriber with subscriber to topic: "%s"' % param.value)
             if(param.name == DETECT_MODEL_PARAM and param.value != self.current_model_name):
                 self.current_model_name = param.value
                 self.get_logger().info('Replaced current model used with new model: "%s"' % param.value)

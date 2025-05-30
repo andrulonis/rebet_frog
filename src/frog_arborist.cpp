@@ -1,9 +1,5 @@
 #include "rebet_frog/filter_obstacles.h"
-#include "rebet_frog/dock_location.h"
-
-#include "rebet_frog/frog_qrs.h"
 #include "rebet_frog/toad_qrs.h"
-#include "rebet_frog/frog_adapt_nodes.h"
 #include "rebet_frog/toad_adapt_nodes.h"
 #include "rebet/arborist.hpp"
 #include "rebet/json_serialization.hpp"
@@ -32,42 +28,13 @@ public:
   void registerNodesIntoFactory(BT::BehaviorTreeFactory& factory) override
   {    
     //I suppose here you register all the possible custom nodes, and the determination as to whether they are actually used lies in the xml tree provided.      
-    
-    // TOAD
     factory.registerNodeType<DetectPowerQR>("DetectPowerQR");
     factory.registerNodeType<DetectAccuracyQR>("DetectAccuracyQR");
     factory.registerNodeType<AdjustDetectModel>("AdjustDetectModel");
     factory.registerNodeType<AdjustMaxSpeed>("AdjustMaxSpeed");
     factory.registerNodeType<MovementEfficiencyQR>("MovementEfficiencyQR");
     factory.registerNodeType<SafetyQR>("SafetyQR");
-
-
-    // TOAD
-
     factory.registerNodeType<FilterObstacles>("filterObstacles");
-    // factory.registerNodeType<SleepNode>("Sleep");
-
-    factory.registerNodeType<ObjectDetectionEfficiencyQR>("DetectObjectsEfficiently");
-    factory.registerNodeType<SimpleSystemPowerQR>("KeepBatteryMin");
-    factory.registerNodeType<SystemPowerQR>("PowerQR");
-    factory.registerNodeType<ObjectDetectionPowerQR>("DetectObjectsSavePower");
-
-
-    // factory.registerNodeType<MovementEfficiencyQR>("MovementEfficiencyQR");
-    factory.registerNodeType<MovementPowerQR>("MovementPowerQR");
-
-
-    factory.registerNodeType<AdaptPictureRateExternal>("AdaptPictureRate");
-    factory.registerNodeType<AdaptPictureRateInternal>("AdaptPictureRateOff");
-
-    factory.registerNodeType<AdaptMaxSpeedExternal>("AdaptMaxSpeed");
-    factory.registerNodeType<AdaptMaxSpeedInternal>("AdaptMaxSpeedOff");
-
-    factory.registerNodeType<FromExploreToIdentify>("FromExploreToIdentify");
-
-
-    // factory.registerNodeType<AdaptChargeConditionInternal>("WhetherToCharge");
-    factory.registerNodeType<SetDockLocation>("SetChargingDockLocation");
   }
 
   std::optional<BT::NodeStatus> onLoopAfterTick(BT::NodeStatus status) override

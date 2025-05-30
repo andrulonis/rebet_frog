@@ -13,8 +13,6 @@
 #include "rebet/rebet_utilities.hpp"
 #include "rebet_msgs/msg/objects_identified.hpp"
 
-#include "rebet_frog/frog_constants.hpp"
-
 #include "rebet_msgs/msg/qr.hpp"
 #include "diagnostic_msgs/msg/key_value.hpp"
 
@@ -121,7 +119,7 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
     {
       _condition_default = false;
 
-      //Since we are only interested in modifying the x-axis (backwards/forwards) speed, we wrap the adaptation_options given into the required triple of x y theta speeds.
+      // Since we are only interested in modifying the x-axis (backwards/forwards) speed, we wrap the adaptation_options given into the required triple of x y theta speeds.
       std::vector<double> param_values;
       std::string param_name;
       std::string node_name;
@@ -129,7 +127,6 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
       getInput(ADAP_SUB, param_name);
       getInput(ADAP_LOC, node_name);
       
-      power_qr_max_value = (double)calculate_power_motion(WAFFLE_MAX_LIN_VEL);
       aal_msgs::msg::AdaptationOptions variable_param = aal_msgs::msg::AdaptationOptions();
 
       variable_param.name = param_name;
@@ -143,7 +140,7 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
       }
       _var_params.push_back(variable_param); //vector of VariableParameter   
 
-    //If you overwrite tick, and do this at different moments you can change the adaptation options at runtime.  
+    // If you overwrite tick, and do this at different moments you can change the adaptation options at runtime.  
     }
 
     virtual bool evaluate_condition() override
@@ -265,6 +262,5 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
 
     double _default_y_velocity = 0.0; //The robot in question can not move along its y axis independently.
     double _default_theta_velocity = 2.5; //We are not interested in modifying the rotation speed here, but could be extended to do so.
-    double power_qr_max_value;
 };
 }
