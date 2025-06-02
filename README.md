@@ -72,15 +72,6 @@ ros2 run aal adaptation_layer
 ```
 For providing architectural adaptations of ROS2 Nodes.
 
-In the behaviour tree, you must provide absolute path to the directory with the PRISM model and required files in the AdaptNode of the tree as a parameter ```model_dir="/absolute/path/to/model/dir"```. The directory should contain following files: `base_model.pm`, `properties.pctl`, `required_vars.txt` and `utility_function.py` in case of DTMC/CTMC and `base_model.pm`, `property.pctl`, in case of MDP (`required_vars.txt` is also advised in case of a parametrised MDP model, it can be skipped if the model does not require any variables).
-The .txt file requires you to list all the variables used in the model and the properties. If the variable is of string type, you also need to list all the possible values and then they will be treated as an int value, similar to an enum. This arises from the limitation of PRISM not supporting strings. The file structure should look as follows:
-```
-int_var_name
-string_var_name str_value1 str_value2
-```
-
-The .py file should define a function named calculate_utility(prop_results), which takes as argument a list corresponding to the results of the properties defined in the properties file. It should return a floating point number indicating the utility associated to the results of the properties.
-
 ### System Reflection
 ```bash
 ros2 run rebet_frog system_reflection.py
@@ -116,5 +107,15 @@ Ultimately, to start the mission you need to use the following command:
 ros2 run rebet_frog tree_action_client.py BT_NAME
 ```
 where BT_NAME matches the name of a behavior tree defined in the [trees folder](/trees).
-Right now, SLAMandCharge, FROG_BASELINE, FROG_AAL_EXTERNAL, FROG_AAL_INTERNAL are provided. The latter four referring to the evaluation of the ACSOS2024 paper about ReBeT.
-Please note that these trees expect varying combinations of the above listed launch files to be used.
+# TODO: update with other trees (e.g. TOAD_BASELINE etc) + create those trees
+Right now, TOAD is provided.
+
+### PRISM adaptation strategies
+In the case one of the PRISM adaptation strategies is used:
+In the behaviour tree, you must provide absolute path to the directory with the PRISM model and other required files in the AdaptNode of the tree as a parameter ```model_dir="/absolute/path/to/model/dir"```. The directory should contain following files: `base_model.pm`, `properties.pctl`, and `utility_function.py` in case of DTMC/CTMC and `base_model.pm` and `property.pctl` in case of MDP.
+The `utility_function.py` file should define a function named calculate_utility(prop_results), which takes as argument a list corresponding to the results of the properties defined in the properties file. It should return a floating point number indicating the utility associated to the results of the properties.
+
+In the case of the Markov Chain adaptation strategy, if any of the configuration paramaters can come in the form of strings, you should provide a file named `string_config_params.txt` that lists all the names of string parameters and their possible values (also works for string arrays). They will be treated as an int value, similar to an enum. This arises from the limitation of PRISM not supporting strings. Each line of the file should look as follows:
+```
+string_var_name str_value0 str_value1 ...
+```

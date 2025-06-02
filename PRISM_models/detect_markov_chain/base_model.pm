@@ -7,12 +7,13 @@ const double yolov8n_accuracy = 37.0;
 const double yolov8x_accuracy = 53.75;
 const max_num_obs = 10;
 
-formula p_last_object = 1/(max_num_obs-obs_idd);
+formula p_last_object = 1/(max_num_obs-variable);
 
 module camera
-    [] ((detect_model_name = 0 & power_left >= yolov8n_power) | (detect_model_name = 1 & power_left >= yolov8x_power)) & are_all_objects_visited = 0 ->
-        (1-p_last_object) : (obs_idd'=obs_idd+1) +
-        p_last_object : (obs_idd'=obs_idd+1) & (are_all_objects_visited'=1);
+    variable: [0..1] init 0;
+    [] ((detect_model_name = 0) | (detect_model_name = 1)) ->
+        (1-p_last_object) : (variable'=1) +
+        p_last_object : (variable'=0);
 endmodule
 
 rewards "accuracy"
