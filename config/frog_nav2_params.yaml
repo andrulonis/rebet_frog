@@ -135,6 +135,7 @@ controller_server:
     general_goal_checker:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
+      # change these if robot does not face objects right
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 0.20
    

@@ -21,9 +21,12 @@
 					<SafetyQR metric="{@safety_metric}" mean_metric="{@mean_safety_metric}" laser_scan="{@laser_scan}">
 						<AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}" distance_to_pose="{@distance_to_pose}" safety_metric="{@safety_metric}" mean_safety_metric="{@mean_safety_metric}">
 						<!-- <AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}"> -->
-							<ForceSuccess>
-								<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
-							</ForceSuccess>
+							<RetryUntilSuccessful num_attempts="5">
+								<Fallback>
+									<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
+									<Sleep msec="3000"/>
+								</Fallback>
+							</RetryUntilSuccessful>
 						</AdjustMaxSpeed>
 					</SafetyQR>
 					</MovementEfficiencyQR>

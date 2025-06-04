@@ -116,7 +116,8 @@ public:
     double current_x = odom_obj.pose.pose.position.x;
     double current_y = odom_obj.pose.pose.position.y;
 
-    double target_x = poses_to_go_to_[num_executions].x;
+    double offset_distance = -1; // 1 meter south from the target
+    double target_x = poses_to_go_to_[num_executions].x + offset_distance;
     double target_y = poses_to_go_to_[num_executions].y;
 
     double delta_y = target_y - current_y;
@@ -125,8 +126,7 @@ public:
     tf2::Quaternion q_orig, q_rot, q_new;
 
     tf2::fromMsg(odom_obj.pose.pose.orientation, q_orig);
-    // Rotate the previous pose by 180* about X
-    q_rot.setRPY(0.0, 0.0, atan2(delta_y,delta_x));
+    q_rot.setRPY(0.0, 0.0, 0.0);
     q_new = q_rot * q_orig;
     q_new.normalize();    
 
@@ -139,7 +139,6 @@ public:
     // double unit_x = delta_x / magnitude;
     // double unit_y = delta_y / magnitude;
 
-    // double offset_distance = 0.1; // 0.1 meters away from the target
     double goal_x = target_x;
     double goal_y = target_y;
 
