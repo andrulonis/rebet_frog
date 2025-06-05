@@ -196,7 +196,8 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
           auto kv_distance_to_pose = KV_MSG();
           kv_distance_to_pose.key = "distance_to_pose";
           // Fuzzify data
-          int distance_in_cm = static_cast<int>(distance_to_pose*100); // Always round down
+          int distance_in_cm = static_cast<int>(distance_to_pose*100); // Always round down. except for when it would be 0
+          if (distance_in_cm == 0) distance_in_cm++;
           kv_distance_to_pose.value = std::to_string(distance_in_cm);
           current_config.push_back(kv_distance_to_pose);
         }
