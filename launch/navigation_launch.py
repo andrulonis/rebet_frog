@@ -34,7 +34,7 @@ def generate_launch_description():
     map_file = os.path.join(
         get_package_share_directory('rebet_frog'),
         'config',
-        'acsos2024_map.yaml'
+        '3_hydrants.yaml'
         )
 
     nav2_params_file = os.path.join(

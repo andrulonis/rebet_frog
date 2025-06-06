@@ -116,8 +116,7 @@ public:
     double current_x = odom_obj.pose.pose.position.x;
     double current_y = odom_obj.pose.pose.position.y;
 
-    double offset_distance = -1; // 1 meter south from the target
-    double target_x = poses_to_go_to_[num_executions].x + offset_distance;
+    double target_x = poses_to_go_to_[num_executions].x;
     double target_y = poses_to_go_to_[num_executions].y;
 
     double delta_y = target_y - current_y;

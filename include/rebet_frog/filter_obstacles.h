@@ -10,7 +10,6 @@
 #include "behaviortree_cpp/action_node.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 
-
 using PoseStamped = geometry_msgs::msg::PoseStamped;
 using Point = geometry_msgs::msg::Point;
 
@@ -202,8 +201,8 @@ public:
             horizontal_middle = (*std::max_element(all_the_ys.begin(), all_the_ys.end()) + *std::min_element(all_the_ys.begin(), all_the_ys.end())) / 2.0;
             vertical_bottom = *std::min_element(all_the_xs.begin(), all_the_xs.end());
 
-            points_to_visit.push_back({vertical_bottom, -horizontal_middle + 0.15});
-            //the 0.4 is so the robot is a bit below and doesn't collide with the obstacle
+            int vertical_offset = -1;
+            points_to_visit.push_back({vertical_bottom + vertical_offset, -horizontal_middle});
         }
 
         std::vector<Point> route_poses = {};
@@ -293,7 +292,6 @@ public:
         // setOutput(OBS_NUM, (int)reordered_visiting.size());
 
         setOutput(OBS_POS, route_poses);
-
         setOutput(OBS_NUM, (int)route_poses.size());
 
         return BT::NodeStatus::SUCCESS;

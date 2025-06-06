@@ -19,12 +19,14 @@
 				<Sequence>
 					<MovementEfficiencyQR metric="{@move_eff_metric}" odometry="{@odometry}"> 
 					<SafetyQR metric="{@safety_metric}" mean_metric="{@mean_safety_metric}" laser_scan="{@laser_scan}">
-						<!-- <AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}" distance_to_pose="{@distance_to_pose}" safety_metric="{@safety_metric}" mean_safety_metric="{@mean_safety_metric}"> -->
-						<AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}" distance_to_pose="{@distance_to_pose}" safety_metric="{@safety_metric}" mean_safety_metric="{@mean_safety_metric}">>
-							<RetryUntilSuccessful num_attempts="5">
+						<AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}" distance_to_pose="{@distance_to_pose}" safety_metric="{@safety_metric}" mean_safety_metric="{@mean_safety_metric}">
+						<!-- <AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" move_eff_metric="{@move_eff_metric}" distance_to_pose="{@distance_to_pose}" safety_metric="{@safety_metric}" mean_safety_metric="{@mean_safety_metric}"> -->
+							<RetryUntilSuccessful num_attempts="-1">
 								<Fallback>
 									<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
-									<Sleep msec="3000"/>
+									<ForceFailure>
+										<Sleep msec="2000"/>
+									</ForceFailure>
 								</Fallback>
 							</RetryUntilSuccessful>
 						</AdjustMaxSpeed>
@@ -32,8 +34,8 @@
 					</MovementEfficiencyQR>
 					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
 					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
-					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
-					<!-- <AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
+					<!-- <AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/daan-linux/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
+					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
 					<!-- <AdjustDetectModel adaptation_strategy="markov_chain_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/detect_markov_chain" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
 						<DetectObject service_name="/detect_object_srv" objs_detected="{@objs_detected}" detect_power_metric="{@detect_power_metric}"/>
 					</AdjustDetectModel>

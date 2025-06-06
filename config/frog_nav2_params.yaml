@@ -12,6 +12,7 @@ amcl:
     beam_skip_threshold: 0.3
     do_beamskip: false
     global_frame_id: "map"
+    initial_pose: {x: 0.0, y: 0.0, z: 0.0, yaw: 0.0}
     lambda_short: 0.1
     laser_likelihood_max_dist: 2.0
     laser_max_range: 100.0
@@ -137,7 +138,7 @@ controller_server:
       plugin: "nav2_controller::SimpleGoalChecker"
       # change these if robot does not face objects right
       xy_goal_tolerance: 0.20
-      yaw_goal_tolerance: 0.15
+      yaw_goal_tolerance: 0.20
    
     FollowPath:
       plugin: "nav2_rotation_shim_controller::RotationShimController"
