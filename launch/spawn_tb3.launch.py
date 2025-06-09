@@ -25,7 +25,7 @@ def is_point_inside_entities(x, y, entities):
             return True
     return False
 
-DEFAULT_GOAL = 'fire_hydrant'
+DEFAULT_GOAL = 'fire_hydrant_small'
 
 def launch_setup(context, *args, **kwargs):
 
@@ -47,22 +47,19 @@ def launch_setup(context, *args, **kwargs):
 
 
     entities = []
-    robot_position = {'pose':(0.0,0.0,0.0), 'size': (0.3, 0.3, 0.3)}
+    robot_position = {'pose':(0.0,0.0,0.0), 'size': (1, 1, 1)}
     
     for _ in range(num_entities):
-        entity_x_random, entity_y_random = np.random.uniform(low=-1.8, high=1.8, size=2)
+        entity_x_random = np.random.uniform(low=-1.2, high=1.8)
+        entity_y_random = np.random.uniform(low=-1.8, high=1.8)
 
         while(is_point_inside_entities(entity_x_random,entity_y_random, entities + [robot_position])):
-            entity_x_random, entity_y_random = np.random.uniform(low=-1.8, high=1.8, size=2)
+            entity_x_random = np.random.uniform(low=-1.2, high=2)
+            entity_y_random = np.random.uniform(low=-1.8, high=1.8)
 
-        entity = {'pose': (entity_x_random, entity_y_random, -0.14), 'size': (0.25, 0.2, 0.15)}
+        entity = {'pose': (entity_x_random, entity_y_random, -0.14), 'size': (3.0, 2, 1.2)}
 
         entities.append(entity)
-
-    # tb_x_random,tb_y_random = np.random.uniform(low=-1.7, high=1.7, size=2)
-
-    # while(is_point_inside_entities(tb_x_random,tb_y_random, entities)):
-    #   tb_x_random, tb_y_random = np.random.uniform(low=-1.7, high=1.7, size=2) 
 
     tb_x_pose = LaunchConfiguration('x_pose', default=str(0.0))
     tb_y_pose = LaunchConfiguration('y_pose', default=str(0.0))

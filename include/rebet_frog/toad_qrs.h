@@ -141,6 +141,7 @@ class MovementEfficiencyQR : public TaskLevelQR
 
       PortsList child_ports = { 
               InputPort<rebet::SystemAttributeValue>(ODOMETRY),
+              OutputPort<double>(CURRENT_SPEED)
               };
 
       child_ports.merge(base_ports);
@@ -162,11 +163,13 @@ class MovementEfficiencyQR : public TaskLevelQR
           double linear_speed = hypot(fabs(odom_msg.twist.twist.linear.x), fabs(odom_msg.twist.twist.linear.y));
           _odom_last_timestamp = odom_msg.header.stamp;
 
+          setOutput(CURRENT_SPEED, linear_speed);
           setOutput(METRIC, linear_speed);
         }
       }
     }
   private:
+    static constexpr const char* CURRENT_SPEED = "current_speed";
     static constexpr const char* ODOMETRY = "odometry";
 
     builtin_interfaces::msg::Time _odom_last_timestamp;
@@ -177,6 +180,9 @@ class SafetyQR : public TaskLevelQR
   public:
     SafetyQR(const std::string& name, const NodeConfig& config) : TaskLevelQR(name, config, QualityAttribute::Safety)
     {
+      mean_safety = 0;
+      times_safety_calculated = 0;
+      times_fast_while_unsafe = 0;
       obj_last_timestamp = builtin_interfaces::msg::Time();
     }
 
@@ -186,11 +192,18 @@ class SafetyQR : public TaskLevelQR
 
       PortsList child_ports = { 
               InputPort<rebet::SystemAttributeValue>(LASER_SCAN),
+              InputPort<double>(CURRENT_SPEED),
+              OutputPort<double>(CURRENT_SAFETY),
+              OutputPort<double>(MEAN_SAFETY)
               };
 
       child_ports.merge(base_ports);
 
       return child_ports;
+    }
+
+    bool is_unsafe(double lidar_range, double speed){
+      return lidar_range <= 0.1 && speed >= 0.18;
     }
 	
     virtual void calculate_measure() override
@@ -219,17 +232,33 @@ class SafetyQR : public TaskLevelQR
           }
 
           float fitted_nearest = (nearest_object - laser_min) / (laser_max - laser_min);
-          _metric = std::clamp(fitted_nearest,0.0f,1.0f);
-          
+          double safety = std::clamp(fitted_nearest,0.0f,1.0f);
+
+          times_safety_calculated++;
+          mean_safety = mean_safety + ((safety - mean_safety) / (double) times_safety_calculated);
+
+          setOutput(CURRENT_SAFETY, safety);
+          setOutput(MEAN_SAFETY, mean_safety);
+
+          double current_speed;
+          getInput(CURRENT_SPEED, current_speed);
+          if (is_unsafe(safety, current_speed))
+            times_fast_while_unsafe++;
+
+          _metric = times_fast_while_unsafe / times_safety_calculated;
           output_metric();
-          metric_mean();
-          setOutput(MEAN_METRIC,_average_metric);
         }
       }
     }
 
   private:
+    double mean_safety;
+    int times_safety_calculated;
+    int times_fast_while_unsafe;
     builtin_interfaces::msg::Time obj_last_timestamp;
 
+    static constexpr const char* CURRENT_SPEED = "current_speed";
+    static constexpr const char* CURRENT_SAFETY = "current_safety";
+    static constexpr const char* MEAN_SAFETY = "mean_safety";
     static constexpr const char* LASER_SCAN = "laser_scan";
 };

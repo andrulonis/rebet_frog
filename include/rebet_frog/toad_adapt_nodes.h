@@ -159,7 +159,7 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
 
       // Also take into consideration movement speed
       double current_speed;
-      getInput(MOVE_EFF_METRIC, current_speed);
+      getInput(CURRENT_SPEED, current_speed);
       bool high_speed = current_speed >= 0.17;
 
       return window_expired && high_speed;
@@ -170,10 +170,10 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
       PortsList base_ports = AdaptPeriodicallyOnRunning::providedPorts();
 
       PortsList child_ports =  {
-        InputPort<double>(MOVE_EFF_METRIC),
+        InputPort<double>(CURRENT_SPEED),
         InputPort<double>(DISTANCE_TO_POSE),
-        InputPort<double>(SAFETY_METRIC),
-        InputPort<double>(MEAN_SAFETY_METRIC)
+        InputPort<double>(CURRENT_SAFETY),
+        InputPort<double>(MEAN_SAFETY)
         };
       child_ports.merge(base_ports);
 
@@ -188,8 +188,8 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
         double safety;
   
         auto distance_to_pose_res = getInput(DISTANCE_TO_POSE, distance_to_pose);
-        auto current_speed_res = getInput(MOVE_EFF_METRIC, current_speed);
-        auto safety_res = getInput(SAFETY_METRIC, safety);
+        auto current_speed_res = getInput(CURRENT_SPEED, current_speed);
+        auto safety_res = getInput(CURRENT_SAFETY, safety);
 
   
         if (distance_to_pose_res) {
@@ -233,8 +233,8 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
         double safety;
         double mean_safety;
   
-        auto safety_res = getInput(SAFETY_METRIC, safety);
-        auto mean_safety_res = getInput(MEAN_SAFETY_METRIC, mean_safety);
+        auto safety_res = getInput(CURRENT_SAFETY, safety);
+        auto mean_safety_res = getInput(MEAN_SAFETY, mean_safety);
   
         if (safety_res) {
           auto kv_safety = KV_MSG();
@@ -254,10 +254,10 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
       }
 
   private:
-    static constexpr const char* MOVE_EFF_METRIC ="move_eff_metric";
+    static constexpr const char* CURRENT_SPEED ="current_speed";
     static constexpr const char* DISTANCE_TO_POSE ="distance_to_pose";
-    static constexpr const char* SAFETY_METRIC ="safety_metric";
-    static constexpr const char* MEAN_SAFETY_METRIC ="mean_safety_metric";
+    static constexpr const char* CURRENT_SAFETY ="current_safety";
+    static constexpr const char* MEAN_SAFETY ="mean_safety";
     
 
 

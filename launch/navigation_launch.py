@@ -2,7 +2,7 @@ import os
 
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import AnyLaunchDescriptionSource
 from nav2_common.launch import ReplaceString
@@ -31,11 +31,17 @@ def generate_launch_description():
         default_value='frog_navigate_to_pose.xml',
         description='Which Nav2 navigate_to_pose BT to use')
     
-    map_file = os.path.join(
+    map_file_name = DeclareLaunchArgument(
+        'map_file_name',
+        default_value='3_hydrants_map.yaml',
+        description='File to be used as the known map'
+    )
+    
+    map_file = PathJoinSubstitution([
         get_package_share_directory('rebet_frog'),
         'config',
-        '3_hydrants.yaml'
-        )
+        LaunchConfiguration('map_file_name')
+    ])
 
     nav2_params_file = os.path.join(
         get_package_share_directory('rebet_frog'),
@@ -112,6 +118,7 @@ def generate_launch_description():
         use_rviz_arg,
         use_map_arg,
         nav_to_pose_tree_arg,
+        map_file_name,
         nav2_with_map,
         nav2_with_slam,
         start_rviz_cmd,

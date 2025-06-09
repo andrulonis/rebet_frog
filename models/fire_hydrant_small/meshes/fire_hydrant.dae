@@ -167,7 +167,7 @@
       </node>
       <node id="node-FireHydrant" name="FireHydrant">
         <translate>0 -7.0136e-7 16.04526</translate>
-        <!-- <scale>0.333333 0.333333 0.333333</scale> --> <!-- Scale factor for 1/3rd size -->
+        <scale>0.5 0.5 0.5</scale>
         <instance_geometry url="#geom-FireHydrant">
           <bind_material>
             <technique_common>

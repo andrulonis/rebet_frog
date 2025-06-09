@@ -116,7 +116,7 @@ public:
     double current_x = odom_obj.pose.pose.position.x;
     double current_y = odom_obj.pose.pose.position.y;
 
-    double vertical_offset = -0.5;
+    double vertical_offset = -0.6666666;
     double target_x = poses_to_go_to_[num_executions].x + vertical_offset;
     double target_y = poses_to_go_to_[num_executions].y;
 

@@ -137,8 +137,8 @@ controller_server:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
       # change these if robot does not face objects right
-      xy_goal_tolerance: 0.20
-      yaw_goal_tolerance: 0.20
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.25
    
     FollowPath:
       plugin: "nav2_rotation_shim_controller::RotationShimController"
