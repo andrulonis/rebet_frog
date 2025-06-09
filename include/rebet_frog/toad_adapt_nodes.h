@@ -173,7 +173,8 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
         InputPort<double>(CURRENT_SPEED),
         InputPort<double>(DISTANCE_TO_POSE),
         InputPort<double>(CURRENT_SAFETY),
-        InputPort<double>(MEAN_SAFETY)
+        InputPort<double>(MEAN_SAFETY),
+        OutputPort<double>(CHOSEN_MAX_SPEED)
         };
       child_ports.merge(base_ports);
 
@@ -253,11 +254,23 @@ class AdjustMaxSpeed : public AdaptPeriodicallyOnRunning<double>
         return current_context;
       }
 
+      // only used for logging chosen max speed
+      virtual double utility_of_adaptation(rcl_interfaces::msg::Parameter ros2_param) override
+      {
+        auto parameter_object = rclcpp::ParameterValue(ros2_param.value);
+        std::vector<double> chosen_speeds = parameter_object.get<std::vector<double>>();
+        double chosen_max_speed = chosen_speeds[0];
+        setOutput(CHOSEN_MAX_SPEED, chosen_max_speed);
+
+        return -1.0;
+      }
+
   private:
     static constexpr const char* CURRENT_SPEED ="current_speed";
     static constexpr const char* DISTANCE_TO_POSE ="distance_to_pose";
     static constexpr const char* CURRENT_SAFETY ="current_safety";
     static constexpr const char* MEAN_SAFETY ="mean_safety";
+    static constexpr const char* CHOSEN_MAX_SPEED = "chosen_max_speed";
     
 
 

@@ -141,6 +141,7 @@ class MovementEfficiencyQR : public TaskLevelQR
 
       PortsList child_ports = { 
               InputPort<rebet::SystemAttributeValue>(ODOMETRY),
+              InputPort<double>(CHOSEN_MAX_SPEED),
               OutputPort<double>(CURRENT_SPEED)
               };
 
@@ -164,13 +165,21 @@ class MovementEfficiencyQR : public TaskLevelQR
           _odom_last_timestamp = odom_msg.header.stamp;
 
           setOutput(CURRENT_SPEED, linear_speed);
-          setOutput(METRIC, linear_speed);
+
+          double max_speed;
+          if (getInput(CHOSEN_MAX_SPEED, max_speed)) {
+            _metric = max_speed;
+            output_metric();
+            metric_mean();
+            setOutput(MEAN_METRIC, _average_metric);
+          }
         }
       }
     }
   private:
     static constexpr const char* CURRENT_SPEED = "current_speed";
     static constexpr const char* ODOMETRY = "odometry";
+    static constexpr const char* CHOSEN_MAX_SPEED = "chosen_max_speed";
 
     builtin_interfaces::msg::Time _odom_last_timestamp;
 };

@@ -201,7 +201,7 @@ public:
             horizontal_middle = (*std::max_element(all_the_ys.begin(), all_the_ys.end()) + *std::min_element(all_the_ys.begin(), all_the_ys.end())) / 2.0;
             vertical_bottom = *std::min_element(all_the_xs.begin(), all_the_xs.end());
 
-            points_to_visit.push_back({vertical_bottom, -horizontal_middle});
+            points_to_visit.push_back({vertical_bottom, -horizontal_middle + 0.12});
             // The offset to avoid driving into the pose being inside of the obstacle is now in visitobstacle_action
         }
 
