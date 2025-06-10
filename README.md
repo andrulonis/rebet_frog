@@ -50,6 +50,8 @@ cd ~/rebet_ws/src/aal/prism-4.8.1-linux64-x86
 ./install.sh
 ```
 
+8. Download YOLOv8x model from [here](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8x.pt) and place it in ```~/rebet_ws/src/rebet_frog/config/``` - this limitation comes from the fact that Git LFS cannot be used on forks and the file's size is more than 100MB.
+
 ## Usage:
 There are myriad launch files which need to be executed. No matter which configuration of rebet_frog you want to use the following launch files should be used:
 Make sure you always have the workspace sourced when running these commands (```source ~/rebet_ws/install/setup.bash```).
@@ -64,7 +66,7 @@ For launching the simulation and spawning the turtlebot3 waffle into the world.
 ```bash
 ros2 launch rebet_frog arborist_config_launch.py
 ```
-For managing the behavior trees.
+For managing the behaviour trees.
 
 ### AAL
 ```bash
@@ -106,9 +108,8 @@ Ultimately, to start the mission you need to use the following command:
 ```bash
 ros2 run rebet_frog tree_action_client.py BT_NAME
 ```
-where BT_NAME matches the name of a behavior tree defined in the [trees folder](/trees).
-# TODO: update with other trees (e.g. TOAD_BASELINE etc) + create those trees
-Right now, TOAD is provided.
+where BT_NAME matches the name (ID) of a behaviour tree defined in the [trees folder](/trees).
+Right now, TOAD_PRISM, TOAD_RANDOM, TOAD_GREEDY, TOAD_CONSERVATIVE are provided.
 
 ### PRISM adaptation strategies
 In the case one of the PRISM adaptation strategies is used:
