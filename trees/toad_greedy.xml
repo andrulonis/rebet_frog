@@ -1,0 +1,48 @@
+<root BTCPP_format="4" main_tree_to_execute="TOAD_GREEDY">
+  	<BehaviorTree ID="TOAD_GREEDY">
+		<Sequence>
+			<Sleep msec="3000"/> 
+			<RetryUntilSuccessful num_attempts="-1">
+				<getRobotPose topic_name="/odom" out_pose="{current_pose}" />
+			</RetryUntilSuccessful>
+
+			<initialPose topic_name="initialpose" in_pose="{current_pose}" />
+			<Sleep msec="3000"/>
+			
+			<RetryUntilSuccessful num_attempts="-1">
+				<getMap service_name="/map_server/map" map_retrieved="{current_map}"/>
+			</RetryUntilSuccessful>
+			
+			<filterObstacles map_to_filter="{current_map}" obstacle_positions="{route_poses}" obstacle_number="{num_obstacles}"/>
+			<Sleep msec="1000"/>
+			<Repeat num_cycles="{num_obstacles}">
+				<Sequence>
+					<MovementEfficiencyQR metric="{@move_eff_metric}" mean_metric="{@move_eff_metric_mean}" current_speed="{@current_speed}" chosen_max_speed="{@chosen_max_speed}" odometry="{@odometry}"> 
+					<SafetyQR metric="{@safety_metric}" current_safety="{@current_safety}" mean_safety="{@mean_safety}" current_speed="{@current_speed}" laser_scan="{@laser_scan}">
+						<!-- <AdjustMaxSpeed adaptation_strategy="random_strategy" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" current_speed="{@current_speed}" distance_to_pose="{@distance_to_pose}" current_safety="{@current_safety}" mean_safety="{@mean_safety}"> -->
+						<AdjustMaxSpeed adaptation_strategy="random_strategy" adaptation_period="1" adaptation_options="0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" current_speed="{@current_speed}" distance_to_pose="{@distance_to_pose}" current_safety="{@current_safety}" mean_safety="{@mean_safety}" chosen_max_speed="{@chosen_max_speed}">
+							<RetryUntilSuccessful num_attempts="-1">
+								<Fallback>
+									<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
+									<ForceFailure>
+										<Sleep msec="2000"/>
+									</ForceFailure>
+								</Fallback>
+							</RetryUntilSuccessful>
+						</AdjustMaxSpeed>
+					</SafetyQR>
+					</MovementEfficiencyQR>
+					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
+					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
+					<!-- <AdjustDetectModel adaptation_strategy="random_strategy" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}"> -->
+					<AdjustDetectModel adaptation_strategy="random_strategy" adaptation_options="yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
+						<DetectObject service_name="/detect_object_srv" objs_detected="{@objs_detected}" detect_power_metric="{@detect_power_metric}"/>
+					</AdjustDetectModel>
+					</DetectPowerQR>
+					</DetectAccuracyQR>
+				</Sequence>
+			</Repeat>
+			<Sleep msec="1000"/>
+		</Sequence>
+    </BehaviorTree>
+</root>
