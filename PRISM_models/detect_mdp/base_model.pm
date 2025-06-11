@@ -1,6 +1,6 @@
 mdp
 
-const max_power_budget = 30;
+const max_power_budget = 75;
 const yolov8n_power = 2;
 const yolov8x_power = 14;
 const yolov8n_accuracy = 37;
