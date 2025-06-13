@@ -202,6 +202,7 @@ class SafetyQR : public TaskLevelQR
       PortsList child_ports = { 
               InputPort<rebet::SystemAttributeValue>(LASER_SCAN),
               InputPort<double>(CURRENT_SPEED),
+              InputPort<double>(CHOSEN_MAX_SPEED),
               OutputPort<double>(CURRENT_SAFETY),
               OutputPort<double>(MEAN_SAFETY)
               };
@@ -212,7 +213,7 @@ class SafetyQR : public TaskLevelQR
     }
 
     bool is_unsafe(double lidar_range, double speed){
-      return lidar_range <= 0.1 && speed >= 0.18;
+      return lidar_range < 0.1 && speed > 0.18;
     }
 	
     virtual void calculate_measure() override
@@ -250,11 +251,13 @@ class SafetyQR : public TaskLevelQR
           setOutput(MEAN_SAFETY, mean_safety);
 
           double current_speed;
+          double chosen_speed;
           getInput(CURRENT_SPEED, current_speed);
-          if (is_unsafe(safety, current_speed))
+          getInput(CHOSEN_MAX_SPEED, chosen_speed);
+          if (is_unsafe(safety, std::min(current_speed,chosen_speed)))
             times_fast_while_unsafe++;
 
-          _metric = times_fast_while_unsafe / times_safety_calculated;
+          _metric = (double) times_fast_while_unsafe / (double) times_safety_calculated;
           output_metric();
         }
       }
@@ -267,6 +270,7 @@ class SafetyQR : public TaskLevelQR
     builtin_interfaces::msg::Time obj_last_timestamp;
 
     static constexpr const char* CURRENT_SPEED = "current_speed";
+    static constexpr const char* CHOSEN_MAX_SPEED = "chosen_max_speed";
     static constexpr const char* CURRENT_SAFETY = "current_safety";
     static constexpr const char* MEAN_SAFETY = "mean_safety";
     static constexpr const char* LASER_SCAN = "laser_scan";

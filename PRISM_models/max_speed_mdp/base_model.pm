@@ -6,11 +6,11 @@ const c1_speed = 26 * adaptation_period; // cm/adaptation loop
 
 const double unsafe_threshold = 0.1;
 
-const double penalty = 0.5;
+const double penalty = 10;
 
 
-formula p_unsafe_short_term = current_safety < unsafe_threshold ? 1 : (current_safety > 1.5*unsafe_threshold ? 0 : (1.5*unsafe_threshold - current_safety) / unsafe_threshold);
-formula p_unsafe_long_term =  mean_safety < 0.5*unsafe_threshold ? 1 : (mean_safety > 1.5*unsafe_threshold ? 0 : (1.5*unsafe_threshold - mean_safety) / unsafe_threshold);
+formula p_unsafe_short_term = (current_safety < unsafe_threshold) ? 1 : (current_safety > 1.5*unsafe_threshold ? 0 : (1.5*unsafe_threshold - current_safety) / unsafe_threshold);
+formula p_unsafe_long_term = (mean_safety < 0.5*unsafe_threshold) ? 1 : (mean_safety > 1.5*unsafe_threshold ? 0 : (1.5*unsafe_threshold - mean_safety) / unsafe_threshold);
 
 module main
     distance_to_pose : [0..distance_to_pose_init] init distance_to_pose_init; // assumed to be in cm
