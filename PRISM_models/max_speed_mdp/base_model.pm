@@ -6,7 +6,7 @@ const c1_speed = 26 * adaptation_period; // cm/adaptation loop
 
 const double unsafe_threshold = 0.1;
 
-const double penalty = 10;
+const double penalty = 0.5;
 
 
 formula p_unsafe_short_term = (current_safety < unsafe_threshold) ? 1 : (current_safety > 1.5*unsafe_threshold ? 0 : (1.5*unsafe_threshold - current_safety) / unsafe_threshold);
