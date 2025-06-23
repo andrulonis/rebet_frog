@@ -15,13 +15,14 @@ mkdir -p ~/rebet_ws/src
 
 2. Clone this repository. For example:
 ```bash
+cd ~/rebet_ws/src
 git clone https://github.com/andrulonis/rebet_frog.git
 ```
 Keep in mind if you are using a specific branch or commit version that should be reflected in the clone, or remedied after cloning the default branch.
 
 3. Clone the dependencies using VCS:
 ```bash
-cd ~/rebet_ws/src
+cd ~/rebet_ws
 vcs import --input src/rebet_frog/frog.rosinstall src
 ```
 
