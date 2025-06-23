@@ -22,7 +22,6 @@ Keep in mind if you are using a specific branch or commit version that should be
 
 3. Clone the dependencies using VCS:
 ```bash
-cd ~/rebet_ws
 vcs import --input src/rebet_frog/frog.rosinstall src
 ```
 
