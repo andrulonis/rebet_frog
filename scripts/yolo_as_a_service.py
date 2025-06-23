@@ -76,8 +76,6 @@ class YoloAsAService(Node):
     def detect_obj_service(self, request, response):
         self.get_logger().info('Incoming request')
 
-        # current_model = self.get_parameter(CURRENT_MODEL).get_parameter_value().integer_value
-
         time.sleep(1)
         rgb_msg = self.image_received #assume to be new..
 
@@ -87,8 +85,6 @@ class YoloAsAService(Node):
             im = self.bridge.imgmsg_to_cv2(rgb_msg, desired_encoding="bgr8")
             
             results = self.models[self.current_model_name].predict(source=im, save=False, save_txt=False, verbose=True)  # save predictions as labels
-            # cv2.waitKey(3000)
-            # cv2.destroyAllWindows()
             obj_id.object_names = []
             obj_id.probabilities = []
             for i in range(len(results)):

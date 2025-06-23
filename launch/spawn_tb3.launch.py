@@ -17,7 +17,6 @@ def get_bounding_entity(pose, size):
     max_y = pose[1] + size[1] / 2.0
     return (min_x, max_x, min_y, max_y)
 
-# TODO: Fix so objects don't spwan inside eachother
 def is_point_inside_entities(x, y, entities):
     for entity in entities:
         min_x, max_x, min_y, max_y = get_bounding_entity(entity['pose'], entity['size'])
