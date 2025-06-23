@@ -19,7 +19,7 @@
 				<Sequence>
 					<MovementEfficiencyQR metric="{@move_eff_metric}" mean_metric="{@move_eff_metric_mean}" current_speed="{@current_speed}" chosen_max_speed="{@chosen_max_speed}" odometry="{@odometry}"> 
 					<SafetyQR metric="{@safety_metric}" current_safety="{@current_safety}" mean_safety="{@mean_safety}" current_speed="{@current_speed}" chosen_max_speed="{@chosen_max_speed}" laser_scan="{@laser_scan}">
-						<AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" current_speed="{@current_speed}" distance_to_pose="{@distance_to_pose}" current_safety="{@current_safety}" mean_safety="{@mean_safety}" chosen_max_speed="{@chosen_max_speed}">
+						<AdjustMaxSpeed adaptation_strategy="mdp_strategy" model_dir="/home/<YOUR_USER>/rebet_ws/src/rebet_frog/PRISM_models/max_speed_mdp" adaptation_period="1" adaptation_options="0.18;0.26" adaptation_subject="max_velocity" subject_location="velocity_smoother" current_speed="{@current_speed}" distance_to_pose="{@distance_to_pose}" current_safety="{@current_safety}" mean_safety="{@mean_safety}" chosen_max_speed="{@chosen_max_speed}">
 							<RetryUntilSuccessful num_attempts="-1">
 								<Fallback>
 									<visitObs poses="{route_poses}" name_of_task="{@current_task}"  in_pose="{current_pose}" action_name="navigate_to_pose" distance_to_pose="{@distance_to_pose}"/>
@@ -33,7 +33,7 @@
 					</MovementEfficiencyQR>
 					<DetectAccuracyQR metric="{@detect_accuracy_metric}" objs_detected="{@objs_detected}">
 					<DetectPowerQR metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
-					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/andrulonis/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
+					<AdjustDetectModel adaptation_strategy="mdp_strategy" model_dir="/home/<YOUR_USER>/rebet_ws/src/rebet_frog/PRISM_models/detect_mdp" adaptation_options="yolov8n;yolov8x" adaptation_subject="detect_model_name" subject_location="detect_object" detect_power_metric="{@detect_power_metric}" objs_detected="{@objs_detected}">
 						<DetectObject service_name="/detect_object_srv" objs_detected="{@objs_detected}" detect_power_metric="{@detect_power_metric}"/>
 					</AdjustDetectModel>
 					</DetectPowerQR>
